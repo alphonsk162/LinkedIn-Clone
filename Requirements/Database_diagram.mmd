@@ -1,0 +1,78 @@
+erDiagram
+    AUTH_USER {
+        int id PK
+        string username
+        string email
+        string password
+    }
+
+    USERPROFILE {
+        int id PK
+        int user_id FK
+        string full_name
+        string headline
+        string location
+        text summary
+        string profile_photo
+        string background_photo
+    }
+
+    LICENSES_CERTIFICATES {
+        int id PK
+        int userprofile_id FK
+        string name
+        string issuing_org
+        date issue_date
+        date expiry_date
+        string certificate_file
+    }
+
+    SKILLS {
+        int id PK
+        int userprofile_id FK
+        string skill_name
+    }
+
+    EXPERIENCE {
+        int id PK
+        int userprofile_id FK
+        string company
+        string role
+        date start_date
+        date end_date
+        text description
+    }
+
+    POSTS {
+        int id PK
+        int userprofile_id FK
+        text content
+        string post_file
+        datetime created_at
+    }
+
+    COMMENTS {
+        int id PK
+        int post_id FK
+        int userprofile_id FK
+        text content
+        datetime created_at
+    }
+
+    LIKES {
+        int id PK
+        int post_id FK
+        int userprofile_id FK
+        datetime created_at
+    }
+
+    %% Relationships
+    AUTH_USER ||--o{ USERPROFILE : OneToOne
+    USERPROFILE ||--o{ LICENSES_CERTIFICATES : OneToMany
+    USERPROFILE ||--o{ SKILLS : OneToMany
+    USERPROFILE ||--o{ EXPERIENCE : OneToMany
+    USERPROFILE ||--o{ POSTS : OneToMany
+    USERPROFILE ||--o{ COMMENTS : OneToMany
+    USERPROFILE ||--o{ LIKES : OneToMany
+    POSTS ||--o{ COMMENTS : OneToMany
+    POSTS ||--o{ LIKES : OneToMany
