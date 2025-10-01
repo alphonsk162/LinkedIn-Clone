@@ -1,0 +1,1022 @@
+{% load static %}
+{% load humanize %}
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>LinkedIn</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/feed.css' %}">
+    <link rel="stylesheet" href="{% static 'css/post-section.css' %}">
+    <link rel="stylesheet" href="{% static 'css/comments-section.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f3f2ef;
+            color: #000000d9;
+            line-height: 1.33333;
+        }
+
+        /* Header Styles */
+        .header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            height: 52px;
+        }
+
+        .header-content {
+            max-width: 1128px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 16px;
+        }
+
+        .logo {
+            color: #0a66c2;
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 24px;
+            text-decoration: none;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 280px;
+            margin-right: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 34px;
+            padding: 0 8px 0 40px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            background: #eef3f8;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #000;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px;
+            background: #000;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .mobile-profile-pic {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-container {
+            max-width: 1128px;
+            margin: 0 auto;
+            padding: 76px 16px 0;
+            display: grid;
+            grid-template-columns: 225px 1.1fr 0.45fr;
+            gap: 24px;
+        }
+
+        /* Left Sidebar - Profile Preview */
+.profile-sidebar {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    height: fit-content;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+    padding-bottom: 16px; /* Add some padding at the bottom */
+}
+
+.profile-cover {
+    height: 90px;
+    position: relative;
+    overflow: hidden;
+}
+
+.cover-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.profile-details {
+    margin-top: -36px; /* Pull the details section up to overlap the cover photo */
+    position: relative; /* Needed for z-index and proper stacking */
+}
+
+.profile-pic-container {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    margin: 0 auto; /* Center the profile picture container */
+    margin-left: 16px;
+}
+
+.profile-pic {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
+    object-fit: cover;
+}
+
+.profile-info {
+    margin-top: 12px;
+    padding: 0 16px;
+}
+
+.profile-name {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.profile-headline {
+    margin: 0;
+    font-size: 14px;
+    color: #5e5e5e;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 16px;
+    padding: 0 16px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: #5e5e5e;
+}
+
+.stat-value {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+        /* Main Feed */
+        /* .feed {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        .create-post {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .post-input-container {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .post-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+        }
+
+        .post-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ccc;
+            border-radius: 24px;
+            font-size: 14px;
+            cursor: pointer;
+            background: transparent;
+        }
+
+        .post-input:hover {
+            background: #f3f2ef;
+        }
+
+        .post-actions {
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .post-action {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+        }
+
+        .post-action:hover {
+            background: #f3f2ef;
+        }
+
+        .action-icon {
+            font-size: 18px;
+        } */
+
+        /* Right Sidebar */
+        .right-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar-card {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 16px 16px 12px;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .news-item {
+            padding: 8px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid #f3f2ef;
+        }
+
+        .news-item:hover {
+            background: #f3f2ef;
+        }
+
+        .news-item:last-child {
+            border-bottom: none;
+        }
+
+        .news-title {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .news-meta {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .header-content {
+                padding: 0 12px;
+            }
+
+            /* .search-box {
+                display: none;
+            } */
+
+            .nav-menu {
+                display: none;
+            }
+
+            .mobile-profile-pic {
+                display: block;
+            }
+
+            .main-container {
+                grid-template-columns: 1fr;
+                padding: 76px 0 80px;
+                gap: 0;
+            }
+
+            .profile-sidebar {
+                position: fixed;
+                left: -300px;
+                top: 52px;
+                width: 280px;
+                height: calc(100vh - 52px);
+                z-index: 99;
+                transition: left 0.3s ease;
+                overflow-y: auto;
+            }
+
+            .profile-sidebar.active {
+                left: 0;
+            }
+
+            .overlay {
+                position: fixed;
+                top: 52px;
+                left: 0;
+                width: 100%;
+                height: calc(100vh - 52px);
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 98;
+                display: none;
+            }
+
+            .overlay.active {
+                display: block;
+            }
+
+            .right-sidebar {
+                display: none;
+            }
+
+            .feed {
+                border-radius: 0;
+                border-left: none;
+                border-right: none;
+            }
+
+            /* .create-post {
+                display: none;
+            } */
+
+            /* Mobile Footer */
+            .mobile-footer {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                border-top: 1px solid #e0e0e0;
+                padding: 8px 0;
+                z-index: 100;
+            }
+
+            .footer-nav {
+                display: flex;
+                justify-content: space-around;
+                list-style: none;
+            }
+
+            .footer-nav-item {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                text-decoration: none;
+                color: #666;
+                font-size: 11px;
+                padding: 4px;
+            }
+
+            .footer-nav-item.active {
+                color: #000;
+            }
+
+            .footer-nav-icon {
+                font-size: 24px;
+                margin-bottom: 2px;
+            }
+
+            .post-button {
+                position: fixed;
+                bottom: 80px;
+                right: 16px;
+                width: 56px;
+                height: 56px;
+                background: #0a66c2;
+                border-radius: 50%;
+                border: none;
+                color: white;
+                font-size: 20px;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+                z-index: 99;
+            }
+        }
+
+        @media (min-width: 769px) {
+            .mobile-footer,
+            .post-button {
+                display: none;
+            }
+        }
+
+
+
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 220px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.dropdown-menu .profile-preview {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.dropdown-menu h4 {
+    margin: 5px 0 2px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.dropdown-menu p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.view-profile-btn {
+    display: block;
+    text-align: center;
+    /* padding: 8px 12px; */
+    background: #ffffff;
+    color: #0a66c2;
+    border: 1px solid #0a66c2; /* LinkedIn blue border */
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.view-profile-btn:hover {
+    border: 8px solid #0a66c2;
+    background: #cbdbe9;   /* LinkedIn blue fill */
+    color: #0a66c2;        /* White text */
+    border: 1px solid #0a66c2; /* Keep border same */
+}
+
+        .nav-item-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+        }
+.divider {
+    border: none;
+    border-top: 1px solid #ddd; /* light gray line */
+    margin: -5px 0px;
+    padding-top: 5px;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">in</a>
+            
+            <div class="search-box">
+                <form method="POST" action="search_results">
+                {% csrf_token %}
+                <span class="search-icon"> <button type="submit" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-search"></i></button></span>
+                <input type="text" class="search-input" name="search_input" placeholder="Search">
+                </form>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item active" onclick="toggleProfileMenu(event)">
+                    <span class="nav-icon"><i class="fa-solid fa-home"></i></span>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                    <span>My Network</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                    <span>Jobs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-comment-dots"></i></span>
+                    <span>Messaging</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-bell"></i></span>
+                    <span>Notifications</span>
+                </a>
+                <!-- <a href="#" class="nav-item profile-dropdown" onclick="toggleProfileMenu(event)">
+                    <span class="nav-icon" style="margin-top: 2px; margin-bottom: -2px;"><img src="https://avatar.iran.liara.run/public" alt="Your Profile" style="width: 24px; height: 24px; border-radius: 50%; "></span>
+                    <span>Me ▼</span>
+                </a> -->
+
+                <div class="nav-item profile-dropdown">
+                    <a href="#" class="nav-item-profile" onclick="toggleProfileMenu(event)">
+                        <span class="nav-icon" style="margin-top: 2px; margin-bottom: -2px;">
+                       <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 24px; height: 24px; border-radius: 50%;">
+                        </span>
+                        <span>Me ▼</span>
+                    </a>
+
+                    <!-- Dropdown -->
+                    <div id="profileMenu" class="dropdown-menu">
+                        <div class="profile-preview">
+                        <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;">
+                            <h4>{{user_profile.full_name}}</h4>
+                            {% if user_profile.headline %}
+                            <p>{{user_profile.headline}}</p>
+                            {% endif %}
+                        </div>
+                        <a href="profile" class="view-profile-btn">View Profile</a>
+                        <form method="POST" action="{% url 'logout' %}" style="margin: 0; padding: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="signout-btn" style="
+                                width: 100%;
+                                background: none;
+                                border: none;
+                                padding: 10px;
+                                text-align: center;
+                                cursor: pointer;
+                                font-size: 14px;
+                                color: #333;
+                            ">
+                                Sign Out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+
+
+
+            <div class="mobile-profile-pic" onclick="toggleProfileSidebar()">
+                👤
+            </div>
+        </div>
+    </header>
+
+    <!-- Overlay for mobile -->
+    <div class="overlay" id="overlay" onclick="toggleProfileSidebar()"></div>
+
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Left Sidebar - Profile Preview -->
+<aside class="profile-sidebar" id="profileSidebar">
+    <div class="profile-cover">
+        <img class="cover-image" src="{% static 'images/default-cover.png' %}" alt="Profile Cover Photo">
+    </div>
+    <div class="profile-details">
+        <div class="profile-pic-container">
+        <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+        alt="Profile Picture" alt="Profile Picture" class="profile-pic">
+        </div>
+        <div class="profile-info">
+            <h3 class="profile-name">{{user_profile.full_name}}</h3>
+            {% if user_profile.headline %}
+            <p class="profile-headline">{{user_profile.headline}}</p>
+            {% endif %}
+        </div>
+        <!-- <div class="profile-stats">
+            <div class="stat-item">
+                <span class="stat-label">Connections</span>
+                <span class="stat-value">500+</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-label">Views</span>
+                <span class="stat-value">1,250</span>
+            </div>
+        </div> -->
+    </div>
+</aside>
+
+    <!-- Main Feed -->
+    <div class="feed">
+        <div class="create-post">
+            <div class="post-input-container">
+                <div class="post-avatar">
+                <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+                alt="Profile Picture" alt="Profile Picture" class="profile-pic">
+                </div>
+                <input type="text" class="post-input" placeholder="Start a post" readonly id="startPostBtn">
+                <button class="photo-button" id="photoBtn" type="button">
+                    <i class="fa-solid fa-image"></i>
+                </button>
+            </div>
+        </div>
+        <hr class="divider">
+        {% for post in posts %}
+        <div class="post-card">
+                <div class="post-header">
+                    <div class="post-author">
+                        <img src="{{post.user.profile_photo.url}}" alt="User" class="post-avatar">
+                        <div class="post-author-info">
+                            <h4 class="post-author-name">{{post.user.full_name}}</h4>
+                            <p class="post-author-headline">{{post.user.}}</p>
+                            <p class="post-timestamp"> {{ post.created_at|naturaltime }}• <i class="fa-solid fa-earth-americas"></i></p>
+                        </div>
+                    </div>
+                    <!-- <button class="post-options-btn">
+                        <i class="fa-solid fa-ellipsis"></i>
+                    </button> -->
+                </div>
+
+                <div class="post-content">
+                    <p class="post-text">{{post.content}}</p>
+                </div>
+
+                <div class="post-image">
+                    <img src="{{post.image.url }}"  alt="Post image">
+
+                </div>
+
+                <!-- <div class="post-stats">
+                    <div class="post-reactions">
+                        <div class="reaction-icons">
+                            <span class="reaction-icon like-icon">👍</span>
+                            <span class="reaction-icon celebrate-icon">🎉</span>
+                            <span class="reaction-icon love-icon">❤️</span>
+                        </div>
+                        <span class="reaction-count">245</span>
+                    </div>
+                    <div class="post-comments-shares">
+                        <span>18 comments</span>
+                    </div>
+                </div> -->
+
+                <div class="post-actions">
+                    <button class="action-btn like-btn {% if post in liked_posts %}liked{% endif %}"  onclick="toggleLike(this)" data-post-id="{{ post.id }}">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                        {% if post in liked_posts %}
+                        <span>Liked</span>
+                        {% else %}
+                        <span>Like</span>
+                        {% endif %}
+                    </button>
+
+
+                    <button class="action-btn comment-btn" onclick="toggleComments(this)" data-post-id="{{ post.id }}">
+                        <i class="fa-regular fa-comment"></i>
+                        <span>Comment</span>
+                    </button>
+                </div>
+
+
+
+
+
+<div class="comments-section" style="display: none;">
+    
+    <!-- Add Comment Form -->
+    <div class="add-comment-container">
+        <img src="{{ user_profile.profile_photo.url }}" alt="Your profile" class="comment-avatar">
+        <form class="comment-input-wrapper" method="POST" action="{% url 'add_comment' %}">
+            {% csrf_token %}
+            <textarea class="comment-input" name="content" placeholder="Add a comment..." rows="1"></textarea>
+            <input type="hidden" name="post_id" value="{{ post.id }}">
+            <input type="hidden" name="comment_type" value="parent">
+            <div class="comment-actions">
+                <button class="comment-post-btn" type="submit">Post</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Comments List -->
+    <div class="comments-list">
+        <!-- Comment 1 -->
+        {% for parent_comment in parent_comments_map|dict_get:post.id %}
+        
+        <div class="comment-item">
+            <img src="{{ parent_comment.user.profile_photo.url }}" alt="Profile" class="comment-avatar">
+            <div class="comment-content">
+                <div class="comment-bubble">
+                    <div class="comment-header">
+                        <span class="comment-author">{{parent_comment.user.full_name}}</span>
+                        <span class="comment-headline">{{parent_comment.user.headline}}</span>
+                    </div>
+                    <p class="comment-text">{{parent_comment.content}}</p>
+                </div>
+                <div class="comment-meta">
+                    <span class="comment-time"> {{ parent_comment.created_at|naturaltime }}</span>
+                    <!-- <button class="comment-like-btn" onclick="toggleCommentLike(this)">
+                        <i class="fa-regular fa-thumbs-up"></i>
+                        Like
+                    </button> -->
+                    <span class="comment-like-count" style="display: none;">0</span>
+                    <button class="comment-reply-btn" onclick="toggleReplyForm(this)">Reply</button>
+                </div>
+
+                <!-- Reply Form (Hidden by default) -->
+                <div class="reply-form" style="display: none;">
+                    <img src="{{ user_profile.profile_photo.url }}" alt="Your profile" class="comment-avatar small">
+                    <form class="comment-input-wrapper" method="post" action="{% url 'add_comment' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="post_id" value="{{ post.id }}">
+                        <input type="hidden" name="parent_id" value="{{ parent_comment.id }}">
+                        <input type="hidden" name="comment_type" value="reply">
+                        <textarea class="comment-input" name="content" placeholder="Add a reply..." rows="1"></textarea>
+                        <div class="comment-actions">
+                            <button class="comment-post-btn">Post</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Replies -->
+                {% for child_comment in child_comments_map|dict_get:parent_comment.id %}
+                <div class="replies-container">
+                    <div class="comment-item reply">
+                        <img src="{{ child_comment.user.profile_photo.url }}" alt="Profile" class="comment-avatar small">
+                        <div class="comment-content">
+                            <div class="comment-bubble">
+                                <div class="comment-header">
+                                    <span class="comment-author">{{child_comment.user.full_name}}</span>
+                                    <span class="comment-headline">{{child_comment.user.headline}}</span>
+                                </div>
+                                <p class="comment-text">{{child_comment.content}}</p>
+                            </div>
+                            <div class="comment-meta">
+                                <span class="comment-time">{{ child_comment.created_at|naturaltime }}</span>
+                                <!-- <button class="comment-like-btn" onclick="toggleCommentLike(this)">
+                                    <i class="fa-regular fa-thumbs-up"></i>
+                                    Like
+                                </button> -->
+                                <span class="comment-like-count" style="display: none;">0</span>
+                                <button class="comment-reply-btn" onclick="toggleReplyForm(this)">Reply</button>
+                            </div>
+                            <form class="reply-form" style="display: none;" method="post" action="{% url 'add_comment' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="post_id" value="{{ post.id }}">
+                                <input type="hidden" name="parent_id" value="{{ parent_comment.id }}">
+                                <input type="hidden" name="comment_type" value="reply">
+                                <img src="{{ user_profile.profile_photo.url }}" alt="Your profile" class="comment-avatar small">
+                                <div class="comment-input-wrapper">
+                                    <textarea class="comment-input" name="content" placeholder="Add a reply..." rows="1"></textarea>
+                                    <div class="comment-actions">
+                                        <button class="comment-post-btn" type="submit">Post</button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+    </div>
+</div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+
+
+
+
+
+    <div class="modal" id="postModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Create a post</h2>
+                <button class="close-modal" id="closeModal" type="button">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form method="POST" action="{% url 'create_post' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="modal-body">
+                <div class="modal-user">
+                    <div class="modal-user-avatar">
+                        <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+                        alt="Profile Picture" alt="Profile Picture" class="profile-pic">
+                    </div>
+                    <div class="modal-user-info">
+                        <h3>{{user_profile.full_name}}</h3>
+                    </div>
+                </div>
+                <textarea class="post-textarea" id="postTextarea" placeholder="What do you want to talk about?" name="content"></textarea>
+                
+                <div class="image-upload-section">
+                    <div class="upload-area" id="uploadArea">
+                        <i class="fa-solid fa-image"></i>
+                        <p>Click to add a photo</p>
+                        <small>Supported formats: JPG, PNG, GIF</small>
+                    </div>
+                    <input type="file" class="file-input" id="fileInput" accept="image/*" name="image">
+                    
+                    <div class="image-preview-container" id="imagePreviewContainer">
+                        <img src="" alt="Preview" class="image-preview" id="imagePreview">
+                        <button class="change-image-btn" id="changeImageBtn" type="button">
+                            <i class="fa-solid fa-pen"></i>
+                            Edit
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="modal-post-button" id="postButton" type="submit" disabled>Post</button>
+            </div>
+            </form>
+        </div>
+
+
+        <!-- Right Sidebar -->
+        <!-- <aside class="right-sidebar">
+            <div class="sidebar-card">
+                <div class="sidebar-header">LinkedIn News</div>
+                <div class="news-item">
+                    <div class="news-title">Tech layoffs continue</div>
+                    <div class="news-meta">Top news • 2,847 readers</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Remote work policies shift</div>
+                    <div class="news-meta">Top news • 1,203 readers</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">AI adoption accelerates</div>
+                    <div class="news-meta">Technology • 3,421 readers</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Startup funding drops</div>
+                    <div class="news-meta">Business • 892 readers</div>
+                </div>
+                <div class="news-item">
+                    <div class="news-title">Green energy investments</div>
+                    <div class="news-meta">Sustainability • 1,567 readers</div>
+                </div>
+            </div>
+        </aside> -->
+    </div>
+
+    <!-- Mobile Footer -->
+    <footer class="mobile-footer">
+        <nav class="footer-nav">
+            <a href="#" class="footer-nav-item active">
+                <span class="footer-nav-icon">🏠</span>
+                <span>Home</span>
+            </a>
+            <a href="#" class="footer-nav-item">
+                <span class="footer-nav-icon">👥</span>
+                <span>Network</span>
+            </a>
+            <a href="#" class="footer-nav-item">
+                <span class="footer-nav-icon">➕</span>
+                <span>Post</span>
+            </a>
+            <a href="#" class="footer-nav-item">
+                <span class="footer-nav-icon">🔔</span>
+                <span>Notifications</span>
+            </a>
+            <a href="#" class="footer-nav-item">
+                <span class="footer-nav-icon">💼</span>
+                <span>Jobs</span>
+            </a>
+        </nav>
+    </footer>
+
+    <!-- Mobile Post Button -->
+    <button class="post-button" onclick="openPostModal()">✏️</button>
+
+    <script>
+        function toggleProfileSidebar() {
+            const sidebar = document.getElementById('profileSidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            // Prevent body scroll when sidebar is open
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = 'auto';
+            }
+        }
+
+        function openPostModal() {
+            alert('Post modal would open here');
+        }
+
+        // Close sidebar when clicking outside
+        document.addEventListener('click', function(event) {
+            const sidebar = document.getElementById('profileSidebar');
+            const overlay = document.getElementById('overlay');
+            const profilePic = document.querySelector('.mobile-profile-pic');
+            
+            if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+                if (!sidebar.contains(event.target) && !profilePic.contains(event.target)) {
+                    toggleProfileSidebar();
+                }
+            }
+        });
+
+        // Handle resize
+        window.addEventListener('resize', function() {
+            const sidebar = document.getElementById('profileSidebar');
+            const overlay = document.getElementById('overlay');
+            
+            if (window.innerWidth > 768) {
+                sidebar.classList.remove('active');
+                overlay.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+
+
+
+function toggleProfileMenu(event) {
+    event.preventDefault();
+    let menu = document.getElementById("profileMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+// Hide dropdown if clicked outside
+document.addEventListener("click", function(event) {
+    let menu = document.getElementById("profileMenu");
+    let button = document.querySelector(".profile-dropdown");
+    if (!button.contains(event.target)) {
+        menu.style.display = "none";
+    }
+});
+    </script>
+<script src="{% static 'js/home-post-photo.js' %}"></script>
+<script src="{% static 'js/home-feed.js' %}"></script>
+<script src="{% static 'js/comments-section.js' %}"></script>
+</body>
+</html>

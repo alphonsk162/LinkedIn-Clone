@@ -1,0 +1,457 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - LinkedIn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f3f2ef;
+            color: rgba(0, 0, 0, 0.9);
+            line-height: 1.4;
+        }
+
+        .header {
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+
+        .header-content {
+            max-width: 1128px;
+            margin: 0 auto;
+            padding: 8px 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            width: 34px;
+            height: 34px;
+            background-color: #0a66c2;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .search-bar {
+            flex: 1;
+            max-width: 280px;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 0 8px 0 40px;
+            height: 34px;
+            border: none;
+            background-color: #eef3f8;
+            font-size: 14px;
+            border-radius: 4px;
+        }
+
+        .container {
+            max-width: 1128px;
+            margin: 24px auto;
+            padding: 0 24px;
+        }
+
+        .main-content {
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .results-header {
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        .results-count {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.6);
+            font-weight: 400;
+        }
+
+        .profile-card {
+            padding: 16px;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            display: flex;
+            gap: 12px;
+            transition: background-color 0.15s ease;
+        }
+
+        .profile-card:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .profile-card:last-child {
+            border-bottom: none;
+        }
+
+        .profile-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .profile-content {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .profile-info {
+            margin-bottom: 8px;
+        }
+
+        .profile-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 2px;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .profile-name:hover {
+            color: #0a66c2;
+            text-decoration: underline;
+        }
+
+        .profile-headline {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .profile-location {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.6);
+            margin-bottom: 4px;
+        }
+
+        .profile-mutual {
+            font-size: 12px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        .profile-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .profile-actions.hidden {
+            display: none;
+        }
+
+        .btn {
+            padding: 6px 16px;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            border: 1px solid;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.5;
+        }
+
+        .btn-connect {
+            background-color: transparent;
+            color: #0a66c2;
+            border-color: #0a66c2;
+        }
+
+        .btn-connect:hover {
+            background-color: rgba(112, 181, 249, 0.15);
+            border-color: #0a66c2;
+        }
+
+        .btn-pending {
+            background-color: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            border-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-pending:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-accept {
+            background-color: #0a66c2;
+            color: white;
+            border-color: #0a66c2;
+        }
+
+        .btn-accept:hover {
+            background-color: #004182;
+            border-color: #004182;
+        }
+
+        .btn-ignore {
+            background-color: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            border-color: rgba(0, 0, 0, 0.6);
+        }
+
+        .btn-ignore:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+            border-color: rgba(0, 0, 0, 0.9);
+            color: rgba(0, 0, 0, 0.9);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            color: rgba(0, 0, 0, 0.25);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h2 {
+            font-size: 20px;
+            font-weight: 400;
+            color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 12px;
+            }
+
+            .profile-card {
+                padding: 12px;
+            }
+
+            .profile-actions {
+                flex-wrap: wrap;
+            }
+
+            .btn {
+                font-size: 14px;
+                padding: 5px 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">in</div>
+            <div class="search-bar">
+                <input type="text" placeholder="Search">
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <main class="main-content">
+            <!-- <div class="results-header">
+                <p class="results-count">About 6 results</p>
+            </div> -->
+
+            <!-- Profile 1: Connect state -->
+            {% for profile in search_results %}
+            <a href="{% url 'view_profile' profile.id %}" style="text-decoration: none; color: inherit;">
+            <div class="profile-card">
+                
+                <div class="profile-avatar"><img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;"></div>
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <div class="profile-name">{{profile.full_name}}</div>
+                        {% if profile.headline %}
+                        <div class="profile-headline">{{profile.headline}}</div>
+                        {% endif %}
+                        {% if profile.location %}
+                        <div class="profile-location">{{profile.location}}</div>
+                        {% endif %}
+                        <!-- <div class="profile-mutual">12 mutual connections</div> -->
+                    </div>
+                    {% if profile.user in request_senders %}
+                    <div class="profile-actions">
+                        <button class="btn btn-accept" onclick="acceptRequest(this)" data-sender-id="{{ profile.id }}">Accept</button>
+                        <button class="btn btn-ignore" onclick="ignoreRequest(this)" data-sender-id="{{ profile.id }}">Ignore</button>
+                    </div>
+                    {% elif profile.user in request_receivers %}
+                    <div class="profile-actions">
+                        <button class="btn btn-pending" onclick="toggleConnect(this)" data-receiver-id="{{ profile.id }}">Pending</button>
+                    </div>
+                    {% elif profile.user in connections %}
+                    <div class="profile-actions">
+                        <button class="btn btn-pending" style="display:none" onclick="toggleConnect(this)"></button>
+                    </div>
+                    {% else %}
+                    <div class="profile-actions">
+                        <button class="btn btn-connect" onclick="toggleConnect(this)" data-receiver-id="{{ profile.id }}">Connect</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            </a>
+            {% endfor %}
+
+
+
+
+
+
+
+        </main>
+    </div>
+<meta name="csrf-token" content="{{ csrf_token }}">
+
+    <script>
+        // Toggle between Connect and Pending states
+        const csrftoken = document.querySelector('meta[name="csrf-token"]').content;
+        function toggleConnect(btn) {
+            const receiverId = btn.dataset.receiverId;
+
+            if (btn.classList.contains('btn-connect')) {
+                fetch(`/send_request/${receiverId}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrftoken,  // CSRF token for Django
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({})  // not really needed, but keeps it clean
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.textContent = 'Pending';
+                        btn.className = 'btn btn-pending';
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => console.error("Error:", error));
+            }
+            else if (btn.classList.contains('btn-pending')) {
+                const receiverId = btn.dataset.receiverId;
+                const csrftoken = getCookie('csrftoken');
+
+                fetch(`/delete_request/${receiverId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.textContent = 'Connect';
+                        btn.className = 'btn btn-connect';
+                    } else {
+                        alert(data.error || 'Failed to cancel request');
+                    }
+                });
+            }
+        }
+
+        // Accept request - hide the actions
+        function acceptRequest(btn) {
+            const actionsDiv = btn.closest('.profile-actions');
+            actionsDiv.classList.add('hidden');
+            const senderId = btn.dataset.senderId;
+
+            fetch("/accept-request/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrftoken,
+                },
+                body: `sender_id=${senderId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            });
+        }
+
+        // Ignore request - hide the actions
+        // function ignoreRequest(btn) {
+        //     const actionsDiv = btn.closest('.profile-actions');
+        //     actionsDiv.classList.add('hidden');
+        // }
+
+        function ignoreRequest(btn) {
+            const actionsDiv = btn.closest('.profile-actions');
+            actionsDiv.innerHTML = '<button class="btn btn-connect" onclick="toggleConnect(this)">Connect</button>';
+            const receiverId = btn.dataset.senderId;
+            const csrftoken = getCookie('csrftoken');
+
+            fetch(`/delete_request/${receiverId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    btn.textContent = 'Connect';
+                    btn.className = 'btn btn-connect';
+                } else {
+                    alert(data.error || 'Failed to cancel request');
+                }
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+    </script>
+</body>
+</html>

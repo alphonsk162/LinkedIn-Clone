@@ -1,0 +1,1626 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Profile</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+     <link rel="stylesheet" href="{% static 'css/edit-profile.css' %}">
+    <link rel="stylesheet" href="{% static 'css/add-experience.css' %}">
+    <link rel="stylesheet" href="{% static 'css/add-education.css' %}">
+    <link rel="stylesheet" href="{% static 'css/add-lc.css' %}">
+    <link rel="stylesheet" href="{% static 'css/edit-education.css' %}">
+    <link rel="stylesheet" href="{% static 'css/edit-experience.css' %}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background-color: #f3f2ef;
+            color: #000000e6;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1125px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .profile-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,.15), 0 2px 3px rgba(0,0,0,.2);
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+
+        /* Header Section */
+        .profile-header {
+            position: relative;
+        }
+
+        .cover-photo {
+            height: 200px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cover-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-icon {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: white;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .camera-icon:hover {
+            background: rgba(0,0,0,0.8);
+        }
+
+        .profile-info {
+            padding: 0 24px 24px;
+            position: relative;
+        }
+
+        .profile-picture {
+            width: 170px;
+            height: 170px;
+            border-radius: 50%;
+            border: 4px solid white;
+            position: absolute;
+            top: -180px;
+            left: 24px;
+            overflow: hidden;
+        }
+
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-picture .camera-icon {
+            width: 32px;
+            height: 32px;
+            top: 8px;
+            right: 8px;
+            font-size: 12px;
+        }
+
+        .profile-details {
+            /* margin-top: 100px; */
+            margin-left: 0;
+        }
+
+        .profile-name {
+            font-size: 32px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .profile-headline {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .profile-location {
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .profile-connections {
+            color: #0a66c2;
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .contact-info {
+            color: #0a66c2;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Section Styles */
+        .section {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 0 1px rgba(0,0,0,.15), 0 2px 3px rgba(0,0,0,.2);
+            margin-bottom: 8px;
+            padding: 24px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+.edit-btn {
+        background: transparent;
+        border: none;
+        border-radius: 50%; 
+        width: 40px;       
+        height: 40px;       
+        color: #666;
+        font-size: 20px;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-left: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+        }
+
+        .edit-btn:hover {
+        background: #e0dddd;
+        }
+
+    .add-btn {
+        background: transparent;
+        border: none;
+        border-radius: 50%; 
+        width: 40px;       
+        height: 40px;       
+        color: #666;
+        font-size: 20px;
+        font-weight: 400;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-left: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center; 
+    }
+
+
+        .add-btn:hover {
+            background: #e0dddd;
+        }
+
+        /* Experience Section */
+        .experience-item {
+            display: flex;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .experience-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .company-logo {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            margin-right: 12px;
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+
+        .company-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .experience-details h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .company-name {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .duration {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        .location {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .description {
+            font-size: 14px;
+            color: #000;
+        }
+
+        /* Skills Section */
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 12px;
+        }
+
+        .skill-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e6e6e6;
+        }
+
+        .skill-item:last-child {
+            border-bottom: none;
+        }
+
+        .skill-name {
+            font-size: 14px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .skill-endorsements {
+            font-size: 12px;
+            color: #666;
+        }
+
+        /* Responsive Design */
+        /* @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            .cover-photo {
+                height: 120px;
+            }
+
+            .profile-picture {
+                width: 100px;
+                height: 100px;
+                top: -130px;
+            }
+
+
+
+            .profile-name {
+                font-size: 24px;
+            }
+
+            .profile-headline {
+                font-size: 16px;
+            }
+
+            .section {
+                padding: 16px;
+            }
+
+            .experience-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .company-logo {
+                margin-bottom: 8px;
+                margin-right: 0;
+            }
+
+            .skills-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+            }
+
+            .edit-btn, .add-btn {
+                width: 100%;
+                text-align: center;
+            }
+        } */
+
+        @media (max-width: 480px) {
+            .profile-info {
+                padding: 0 16px 16px;
+            }
+
+            .profile-picture {
+                left: 16px;
+            }
+
+            .section-header {
+                flex-direction: row;
+                align-items: center;
+            }
+
+            .edit-btn, .add-btn {
+                width: auto;
+                font-size: 12px;
+                padding: 4px 12px;
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
+/* HEADER */
+
+
+ .header {
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 100;
+            height: 52px;
+        }
+
+        .header-content {
+            max-width: 1128px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            height: 100%;
+            padding: 0 20px;
+        }
+
+        .logo {
+            color: #0a66c2;
+            font-size: 28px;
+            font-weight: bold;
+            margin-right: 24px;
+            text-decoration: none;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            max-width: 280px;
+            margin-right: 24px;
+        }
+
+        .search-input {
+            width: 100%;
+            height: 34px;
+            padding: 0 8px 0 40px;
+            border: 1px solid #ccc;
+            border-radius: 2px;
+            background: #eef3f8;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 32px;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+            padding: 8px 0;
+            position: relative;
+        }
+
+        .nav-item:hover {
+            color: #000;
+        }
+
+        .nav-item.active {
+            color: #000;
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            bottom: -16px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100%;
+            height: 2px;
+            background: #000;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+            margin-bottom: 4px;
+        }
+
+        .mobile-profile-pic {
+            display: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    right: 0;
+    top: 40px;
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 220px;
+    padding: 15px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+
+.dropdown-menu .profile-preview {
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.dropdown-menu h4 {
+    margin: 5px 0 2px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.dropdown-menu p {
+    margin: 0;
+    font-size: 13px;
+    color: #555;
+}
+
+.view-profile-btn {
+    display: block;
+    text-align: center;
+    /* padding: 8px 12px; */
+    background: #ffffff;
+    color: #0a66c2;
+    border: 1px solid #0a66c2; /* LinkedIn blue border */
+    border-radius: 15px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+.view-profile-btn:hover {
+    border: 8px solid #0a66c2;
+    background: #cbdbe9;   /* LinkedIn blue fill */
+    color: #0a66c2;        /* White text */
+    border: 1px solid #0a66c2; /* Keep border same */
+}
+
+        .nav-item-profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #666;
+            font-size: 12px;
+        }
+
+
+        @media (max-width: 769px) {
+            .header {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+   <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">in</a>
+            
+            <div class="search-box">
+                <span class="search-icon"> <i class="fa-solid fa-search"></i></span>
+                <input type="text" class="search-input" placeholder="Search">
+            </div>
+
+            <nav class="nav-menu">
+                <a href="#" class="nav-item" onclick="toggleProfileMenu(event)">
+                    <span class="nav-icon"><i class="fa-solid fa-home"></i></span>
+                    <span>Home</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                    <span>My Network</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                    <span>Jobs</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-comment-dots"></i></span>
+                    <span>Messaging</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-bell"></i></span>
+                    <span>Notifications</span>
+                </a>
+                <!-- <a href="#" class="nav-item profile-dropdown" onclick="toggleProfileMenu(event)">
+                    <span class="nav-icon" style="margin-top: 2px; margin-bottom: -2px;"><img src="https://avatar.iran.liara.run/public" alt="Your Profile" style="width: 24px; height: 24px; border-radius: 50%; "></span>
+                    <span>Me ▼</span>
+                </a> -->
+
+                <div class="nav-item profile-dropdown">
+                    <a href="#" class="nav-item-profile" onclick="toggleProfileMenu(event)">
+                        <span class="nav-icon" style="margin-top: 2px; margin-bottom: -2px;">
+                            <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 24px; height: 24px; border-radius: 50%;">
+                        </span>
+                        <span>Me ▼</span>
+                    </a>
+
+                    <!-- Dropdown -->
+                    <div id="profileMenu" class="dropdown-menu">
+                        <div class="profile-preview">
+                       <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;">
+                            <h4>{{user_profile.full_name}}</h4>
+                            {% if user_profile.headline %}
+                            <p>{{user_profile.headline}}</p>
+                            {% endif %}
+                        </div>
+                        <a href="profile" class="view-profile-btn">View Profile</a>
+                    </div>
+                </div>
+            </nav>
+
+
+
+            <div class="mobile-profile-pic" onclick="toggleProfileSidebar()">
+                👤
+            </div>
+        </div>
+    </header>
+    <div class="container">
+        <!-- Profile Header -->
+        <div class="profile-card">
+            <div class="profile-header">
+                <div class="cover-photo">
+                    <img src="{% if user_profile.background_photo %}{{ user_profile.background_photo.url }}{% else %}{% static 'images/default-cover.png' %}{% endif %}" 
+    alt="Cover Picture">
+                        <form method="POST" action="{% url 'update_cover_photo' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <!-- Hidden file input -->
+                            <input type="file" id="coverPhotoInput" name="cover_photo" style="display:none;" accept="image/*" onchange="this.form.submit()">
+
+                            <!-- Camera icon as label -->
+                            <label for="coverPhotoInput" class="camera-icon">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </form>
+                </div>
+                
+                <div class="profile-info">
+                    <div class="profile-picture">
+                       <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture">
+                        <form method="POST" action="{% url 'update_profile_photo' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            
+                            <!-- Hidden file input -->
+                            <input type="file" id="profilePhotoInput" name="profile_photo" style="display:none;" accept="image/*" onchange="this.form.submit()">
+
+                            <!-- Camera icon as label -->
+                            <label for="profilePhotoInput" class="camera-icon">
+                                <i class="fas fa-camera"></i>
+                            </label>
+                        </form>
+
+                    </div>
+
+                    <div style="display: flex; justify-content:space-between; margin-top: 50px;">
+                    <div class="profile-details">
+                        <h1 class="profile-name">{{user_profile.full_name}}</h1>
+                        {% if user_profile.headline %}
+                        <p class="profile-headline">{{user_profile.headline}}</p>
+                        {% endif %}
+                        {% if user_profile.location %}
+                        <p class="profile-location">{{user_profile.location}}</p>
+                        {% endif %}
+                        <!-- <p class="profile-connections">500+ connections</p>
+                        <p class="contact-info">Contact info</p> -->
+                    </div>
+                    <div>
+
+                    <button class="edit-btn" onclick="openEditUserProfileModal({{ user_profile.id }})">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Experience Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Experience</h2>
+                <div style="display: flex; align-items: center;">
+                    <button class="add-btn" onclick="openExperienceModal()">
+                        <i class="fas fa-plus"></i>
+                    </button>
+
+                </div>
+            </div>
+            
+
+
+<div class="experience-item" style="width:95%; margin-left: 2.5%; justify-content: space-around; display: flex; flex-direction: column; margin-top: 25px; gap: 15px;">
+    {% for experience in experience_list %}  
+    <div class="experience-container" style="display: flex; justify-content:space-between;"> 
+        <div class="experience-details">
+            <h3>{{experience.title}}</h3>
+            <p class="company-name">{{experience.company}}</p>
+            <p class="duration"> {{experience.start_date}} - 
+                {% if not experience.end_date %}
+                Present
+                {% else %}
+                {{ experience.end_date }}
+                {% endif %}· {{ experience.duration }}</p>
+            <p class="location">{{experience.location}}</p>
+            <p class="description">{{experience.description}}</p>
+        </div>
+        <button class="edit-btn" onclick="openEditExperienceModal({{ experience.id }})">
+            <i class="fas fa-pen"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+
+
+            <div class="modal-overlay" id="experienceModal">
+                <div class="modal">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Add experience</h3>
+                        <button class="close-btn" onclick="closeExperienceModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="experienceForm" method="POST" action="add_experience">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="title" class="required">Title</label>
+                                <input type="text" id="title" name="title" class="form-control" placeholder="Ex: Retail Sales Manager">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="employmentType">Employment type</label>
+                                <select id="employmentType" name="employmentType" class="form-control">
+                                    <option value="">Please select</option>
+                                    <option value="full-time">Full-time</option>
+                                    <option value="part-time">Part-time</option>
+                                    <option value="self-employed">Self-employed</option>
+                                    <option value="freelance">Freelance</option>
+                                    <option value="internship">Internship</option>
+                                    <option value="trainee">Trainee</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="company" class="required">Company or organization</label>
+                                <input type="text" id="company" name="company" class="form-control" placeholder="Ex: Microsoft">
+                            </div>
+
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="currentRole" name="currentRole" onchange="toggleEndDate()">
+                                <label for="currentRole">I am currently working in this role</label>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="required">Start date</label>
+                                <div class="date-group">
+                                    <select id="startMonth" name="startMonth" class="form-control">
+                                        <option value="">Month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                    <select id="startYearExp" name="startYearExp" class="form-control">
+                                        <option value="">Year</option>
+
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group" id="endDateGroup">
+                                <label class="required">End date</label>
+                                <div class="date-group">
+                                    <select id="endMonth" name="endMonth" class="form-control">
+                                        <option value="">Month</option>
+                                        <option value="1">January</option>
+                                        <option value="2">February</option>
+                                        <option value="3">March</option>
+                                        <option value="4">April</option>
+                                        <option value="5">May</option>
+                                        <option value="6">June</option>
+                                        <option value="7">July</option>
+                                        <option value="8">August</option>
+                                        <option value="9">September</option>
+                                        <option value="10">October</option>
+                                        <option value="11">November</option>
+                                        <option value="12">December</option>
+                                    </select>
+                                    <select id="endYearExp" name="endYearExp" class="form-control">
+                                        <option value="">Year</option>
+                                        <!-- Years will be populated by JavaScript -->
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input type="text" id="location" name="location" class="form-control" placeholder="Ex: London, United Kingdom">
+                            </div>
+
+                            <div class="form-group">
+                                <label for="locationType">Location type</label>
+                                <select id="locationType" name="locationType" class="form-control">
+                                    <option value="">Please select</option>
+                                    <option value="on-site">On-site</option>
+                                    <option value="hybrid">Hybrid</option>
+                                    <option value="remote">Remote</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="description">Description</label>
+                                <textarea id="description" name="description" class="form-control" placeholder="Describe your role and responsibilities..."></textarea>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="headline">Profile headline</label>
+                                <input type="text" id="headline" name="headline" class="form-control" placeholder="Ex: Software Engineer at Google">
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" onclick="closeExperienceModal()">Cancel</button>
+                                <button type="submit" class="btn btn-primary" >Save</button>
+                            </div>
+                        </form>
+                    </div>
+
+
+                </div>
+            </div>
+
+     
+
+
+
+
+            
+
+
+        <!-- Education Section -->
+        <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Education</h2>
+                <div style="display: flex; align-items: center;">
+                    <button class="add-btn" onclick="openEducationModal(this)">
+                        <i class="fas fa-plus"></i>
+                    </button>
+
+                </div>
+            </div>
+            
+<div class="experience-item" style="width:95%; margin-left: 2.5%; justify-content: space-around; display: flex; flex-direction: column; margin-top: 25px; gap: 15px;">
+    {% for education in education_list %}  
+    <div class="experience-container" style="display: flex; justify-content:space-between;"> 
+        <div class="experience-details">
+            <h3>{{education.degree}}</h3>
+            <p class="company-name">{{education.school}}</p>
+            <p class="duration"> {{education.start_date}} - 
+                {% if not education.end_date %}
+                Present
+                {% else %}
+                {{ education.end_date }}
+                {% endif %} {{ education.duration }}</p>
+            <p class="location">{{education.location}}</p>
+            <p class="description">{{education.description}}</p>
+        
+        </div>
+        <button class="edit-btn" onclick="editEducationModal(this)" data-education-id="{{education.id}}">
+            <i class="fas fa-pen"></i>
+        </button>
+    </div>
+    {% endfor %}
+</div>
+ <!-- Modal -->
+    <div class="modal-overlay" id="educationModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3 class="modal-title">Add education</h3>
+                <button class="close-btn" onclick="closeEducationModal()">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <form class="modal-body" method="post" action="add_education">
+                {% csrf_token%}
+                <div class="form-group">
+                    <label for="school">School <span class="required">*</span></label>
+                    <input type="text" id="school" name="school" class="form-control" placeholder="Ex: Boston University" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="degree">Degree</label>
+                    <input type="text" id="degree" name="degree" class="form-control" placeholder="Ex: Bachelor's" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="field">Field of study</label>
+                    <input type="text" id="field" name="field" class="form-control" placeholder="Ex: Business">
+                </div>
+
+                <div class="date-row">
+                    <div class="date-group">
+                        <div class="date-label">Start date</div>
+                        <select id="startMonth" name="startMonth" required>
+                            <option value="">Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <select id="startYearEdu" name="startYearEdu" required>
+                            <option value="">Year</option>
+                        </select>
+                    </div>
+
+                    <div class="date-group">
+                        <div class="date-label">End date (or expected)</div>
+                        <select id="endMonth" name="endMonth">
+                            <option value="">Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                        <select id="endYearEdu" name="endYearEdu">
+                            <option value="">Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="grade">Grade</label>
+                    <input type="text" id="grade" name="grade" class="form-control" placeholder="">
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" name="description" class="form-control" placeholder=""></textarea>
+                </div>
+            <div class="modal-footer">
+                <button type="submit" class="btn btn-primary" >
+                    Save
+                </button>
+            </div>
+            </form>
+
+        </div>
+    </div>
+        </div>
+
+        <!-- Licenses & Certifications Section -->
+        <!-- <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Licenses & certifications</h2>
+                <div style="display: flex; align-items: center;">
+                    <button class="add-btn" id='addLicenseCertBtn'>
+                        <i class="fas fa-plus"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="experience-item">
+                <div class="experience-details">
+                    <h3>AWS Certified Solutions Architect</h3>
+                    <p class="company-name">Amazon Web Services (AWS)</p>
+                    <p class="duration">Issued Jan 2023 · Expires Jan 2026</p>
+                    <p class="description">Credential ID: AWS-ASA-12345</p>
+                </div>
+            </div>
+            
+            <div class="experience-item">
+                <div class="experience-details">
+                    <h3>Certified Kubernetes Administrator</h3>
+                    <p class="company-name">Cloud Native Computing Foundation</p>
+                    <p class="duration">Issued Jun 2022 · Expires Jun 2025</p>
+                    <p class="description">Credential ID: CKA-67890</p>
+                </div>
+            </div>
+        </div>
+
+    <div class="lc-modal-overlay" id="licenseCertModal">
+        <div class="lc-modal-container">
+            <div class="lc-modal-content">
+                <div class="lc-modal-header">
+                    <h3 class="lc-modal-title">Add license or certification</h3>
+                    <button class="lc-close-btn" id="closeLicenseCertModal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <form id="licenseCertificateForm">
+                    <div class="lc-modal-body">
+                        <div class="lc-form-group">
+                            <label for="licenseNameLC" class="lc-form-label">
+                                Name <span class="lc-required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="licenseNameLC" 
+                                name="licenseNameLC" 
+                                class="lc-form-input" 
+                                placeholder="Ex: Microsoft Certified: Azure Fundamentals"
+                                required
+                            >
+                        </div>
+
+                        <div class="lc-form-group">
+                            <label for="issuingOrgLC" class="lc-form-label">
+                                Issuing organization <span class="lc-required">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                id="issuingOrgLC" 
+                                name="issuingOrgLC" 
+                                class="lc-form-input" 
+                                placeholder="Ex: Microsoft"
+                                required
+                            >
+                        </div>
+
+                        <div class="lc-form-group">
+                            <label for="issueDateLC" class="lc-form-label">
+                                Issue date <span class="lc-required">*</span>
+                            </label>
+                            <input 
+                                type="date" 
+                                id="issueDateLC" 
+                                name="issueDateLC" 
+                                class="lc-form-input"
+                                required
+                            >
+                        </div>
+
+                        <div class="lc-form-group">
+                            <label for="expiryDateLC" class="lc-form-label">
+                                Expiration date
+                            </label>
+                            <input 
+                                type="date" 
+                                id="expiryDateLC" 
+                                name="expiryDateLC" 
+                                class="lc-form-input"
+                            >
+                            <small style="color: #666; font-size: 12px; margin-top: 4px; display: block;">
+                                Leave blank if this credential does not expire
+                            </small>
+                        </div>
+
+                        <div class="lc-form-group">
+                            <label for="certificateFileLC" class="lc-form-label">
+                                Certificate file
+                            </label>
+                            <div class="lc-file-upload-area" id="fileUploadAreaLC">
+                                <div class="lc-file-upload-icon">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                </div>
+                                <div class="lc-file-upload-text">
+                                    Click to upload or drag and drop
+                                </div>
+                                <div class="lc-file-upload-subtext">
+                                    PDF, DOC, DOCX, JPG, PNG (max 10MB)
+                                </div>
+                            </div>
+                            <input 
+                                type="file" 
+                                id="certificateFileLC" 
+                                name="certificateFileLC" 
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                            >
+                            <div id="fileNameDisplayLC" style="margin-top: 8px; font-size: 14px; color: #0a66c2; display: none;">
+                                <i class="fas fa-file"></i>
+                                <span id="selectedFileNameLC"></span>
+                                <button type="button" id="removeFileLC" style="margin-left: 8px; background: none; border: none; color: #d11124; cursor: pointer;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="lc-modal-footer">
+                        <button type="button" class="lc-btn lc-btn-secondary" id="cancelLicenseCertBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="lc-btn lc-btn-primary" id="saveLicenseCertBtn">
+                            Save
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div> -->
+
+        <!-- Skills Section -->
+        <!-- <div class="section">
+            <div class="section-header">
+                <h2 class="section-title">Skills</h2>
+                <div style="display: flex; align-items: center;">
+                    <button class="add-btn">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    <button class="edit-btn">
+                        <i class="fas fa-pen"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="skills-grid">
+                <div class="skill-item">
+                    <span class="skill-name">Python</span>
+                    <span class="skill-endorsements">25 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Django</span>
+                    <span class="skill-endorsements">18 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">React</span>
+                    <span class="skill-endorsements">22 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">JavaScript</span>
+                    <span class="skill-endorsements">30 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">PostgreSQL</span>
+                    <span class="skill-endorsements">15 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">AWS</span>
+                    <span class="skill-endorsements">12 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Docker</span>
+                    <span class="skill-endorsements">20 endorsements</span>
+                </div>
+                <div class="skill-item">
+                    <span class="skill-name">Kubernetes</span>
+                    <span class="skill-endorsements">8 endorsements</span>
+                </div>
+            </div>
+        </div>
+    </div> -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Edit Education Model -->
+
+ <div id="edit-education-modal" class="edit-education-modal" style="display: none;">
+    <div class="edit-education-modal-backdrop" onclick="closeEditEducationModal()"></div>
+    <div class="edit-education-modal-content">
+        <div class="edit-education-modal-header">
+            <h2 class="edit-education-modal-title">Edit education</h2>
+            <button class="edit-education-close-btn" onclick="closeEditEducationModal()">
+                <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.36 6.64a1 1 0 0 0-1.41 0L12 11.59l-4.95-4.95a1 1 0 0 0-1.41 1.41L10.59 13l-4.95 4.95a1 1 0 0 0 1.41 1.41L12 14.41l4.95 4.95a1 1 0 0 0 1.41-1.41L13.41 13l4.95-4.95a1 1 0 0 0 0-1.41z"/>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="edit-education-modal-body">
+            <form class="edit-education-form" method="POST" id="edit-education-form">
+                {% csrf_token %}
+                <input type="hidden" id="edit-education-id" name="education_id" />
+                
+                <div class="edit-education-form-group">
+                    <label class="edit-education-label" for="edit-education-school">School *</label>
+                    <input type="text" 
+                           id="edit-education-school" 
+                           name="school"
+                           class="edit-education-input" 
+                           placeholder="Ex: Boston University" 
+                           required>
+                </div>
+                
+                <div class="edit-education-form-group">
+                    <label class="edit-education-label" for="edit-education-degree">Degree</label>
+                    <input type="text" 
+                           id="edit-education-degree" 
+                           name="degree"
+                           class="edit-education-input" 
+                           placeholder="Ex: Bachelor's">
+                </div>
+                
+                <div class="edit-education-form-group">
+                    <label class="edit-education-label" for="edit-education-field-study">Field of study</label>
+                    <input type="text" 
+                           id="edit-education-field-study" 
+                           name="field_of_study"
+                           class="edit-education-input" 
+                           placeholder="Ex: Business">
+                </div>
+                
+                <div class="edit-education-date-row">
+                    <div class="edit-education-date-group">
+                        <label class="edit-education-label">Start date</label>
+                        <div class="edit-education-date-inputs">
+                            <select id="edit-education-start-month" name="start_month" class="edit-education-select">
+                                <option value="">Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select id="edit-education-start-year" name="start_year" class="edit-education-select edit-education-year-select">
+                                <option value="">Year</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="edit-education-date-group" id="edit-education-end-date-group">
+                        <label class="edit-education-label">End date (or expected)</label>
+                        <div class="edit-education-date-inputs">
+                            <select id="edit-education-end-month" name="end_month" class="edit-education-select">
+                                <option value="">Month</option>
+                                <option value="1">January</option>
+                                <option value="2">February</option>
+                                <option value="3">March</option>
+                                <option value="4">April</option>
+                                <option value="5">May</option>
+                                <option value="6">June</option>
+                                <option value="7">July</option>
+                                <option value="8">August</option>
+                                <option value="9">September</option>
+                                <option value="10">October</option>
+                                <option value="11">November</option>
+                                <option value="12">December</option>
+                            </select>
+                            <select id="edit-education-end-year" name="end_year" class="edit-education-select edit-education-year-select">
+                                <option value="">Year</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="edit-education-form-group">
+                    <div class="edit-education-checkbox-group">
+                        <input type="checkbox" 
+                               id="edit-education-current" 
+                               name="is_current"
+                               class="edit-education-checkbox"
+                               onchange="toggleEditEducationEndDate(this)">
+                        <label for="edit-education-current" class="edit-education-checkbox-label">
+                            I am currently studying here
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="edit-education-form-group">
+                    <label class="edit-education-label" for="edit-education-grade">Grade</label>
+                    <input type="text" 
+                           id="edit-education-grade" 
+                           name="grade"
+                           class="edit-education-input" 
+                           placeholder="Ex: 3.8/4.0">
+                </div>
+                
+                <div class="edit-education-form-group">
+                    <label class="edit-education-label" for="edit-education-description">Description</label>
+                    <textarea id="edit-education-description" 
+                              name="description"
+                              class="edit-education-textarea" 
+                              rows="4" 
+                              placeholder="Describe your education experience..."></textarea>
+                </div>
+                
+                <div class="edit-education-modal-footer">
+                    <button type="submit" class="edit-education-save-btn">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Edit Experience Modal/Form -->
+<div id="edit-experience-modal" class="edit-experience-modal">
+    <div class="edit-experience-form-container">
+        <div class="edit-experience-form-header">
+            <h2>Edit experience</h2>
+            <button type="button" class="edit-experience-close-btn" onclick="closeEditExperienceModal()">×</button>
+        </div>
+        
+        <form id="edit-experience-form" method="POST">
+            <div class="edit-experience-form-body">
+                {% csrf_token %}
+                <input type="hidden" id="edit-experience-id" name="experience_id">
+                
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-title">Title <span class="edit-experience-required">*</span></label>
+                    <input type="text" id="edit-experience-title" name="title" placeholder="Ex: Retail Sales Manager" required>
+                </div>
+
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-employment-type">Employment type</label>
+                    <select id="edit-experience-employment-type" name="employment_type">
+                        <option value="">Please select</option>
+                        <option value="full-time">Full-time</option>
+                        <option value="part-time">Part-time</option>
+                        <option value="self-employed">Self-employed</option>
+                        <option value="freelance">Freelance</option>
+                        <option value="contract">Contract</option>
+                        <option value="internship">Internship</option>
+                        <option value="apprenticeship">Apprenticeship</option>
+                        <option value="seasonal">Seasonal</option>
+                    </select>
+                </div>
+
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-company">Company or organization <span class="edit-experience-required">*</span></label>
+                    <input type="text" id="edit-experience-company" name="company" placeholder="Ex: Microsoft" required>
+                </div>
+
+                <div class="edit-experience-checkbox-group">
+                    <input type="checkbox" id="edit-experience-is-current" name="is_current">
+                    <label for="edit-experience-is-current">I am currently working in this role</label>
+                </div>
+
+                <div class="edit-experience-date-row">
+                    <div class="edit-experience-form-group">
+                        <label for="edit-experience-start-month">Start date <span class="edit-experience-required">*</span></label>
+                        <select id="edit-experience-start-month" name="start_month" required>
+                            <option value="">Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="edit-experience-form-group">
+                        <label for="edit-experience-start-year">&nbsp;</label>
+                        <select id="edit-experience-start-year" name="start_year" required>
+                            <option value="">Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="edit-experience-date-row" id="edit-experience-end-date-row">
+                    <div class="edit-experience-form-group">
+                        <label for="edit-experience-end-month">End date <span class="edit-experience-required">*</span></label>
+                        <select id="edit-experience-end-month" name="end_month">
+                            <option value="">Month</option>
+                            <option value="1">January</option>
+                            <option value="2">February</option>
+                            <option value="3">March</option>
+                            <option value="4">April</option>
+                            <option value="5">May</option>
+                            <option value="6">June</option>
+                            <option value="7">July</option>
+                            <option value="8">August</option>
+                            <option value="9">September</option>
+                            <option value="10">October</option>
+                            <option value="11">November</option>
+                            <option value="12">December</option>
+                        </select>
+                    </div>
+                    <div class="edit-experience-form-group">
+                        <label for="edit-experience-end-year">&nbsp;</label>
+                        <select id="edit-experience-end-year" name="end_year">
+                            <option value="">Year</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-location">Location</label>
+                    <input type="text" id="edit-experience-location" name="location" placeholder="Ex: London, United Kingdom">
+                </div>
+
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-location-type">Location type</label>
+                    <select id="edit-experience-location-type" name="location_type">
+                        <option value="">Please select</option>
+                        <option value="on-site">On-site</option>
+                        <option value="hybrid">Hybrid</option>
+                        <option value="remote">Remote</option>
+                    </select>
+                </div>
+
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-description">Description</label>
+                    <textarea id="edit-experience-description" name="description" placeholder="Describe your role and responsibilities..."></textarea>
+                </div>
+
+                <div class="edit-experience-form-group">
+                    <label for="edit-experience-headline">Profile headline</label>
+                    <input type="text" id="edit-experience-headline" name="headline" placeholder="Ex: Software Engineer at Google">
+                </div>
+            </div>
+
+            <div class="edit-experience-form-footer">
+                <button type="submit" class="edit-experience-save-btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+<!-- edit-profile -->
+ <div id="edit-userprofile-modal" class="edit-userprofile-modal">
+    <div class="edit-userprofile-form-container">
+        <div class="edit-userprofile-form-header">
+            <h2>Edit Profile</h2>
+            <button type="button" class="edit-userprofile-close-btn" onclick="closeEditUserProfileModal()">×</button>
+        </div>
+        
+        <form id="edit-userprofile-form" method="POST" action="{% url 'update_profile' user_profile.id %}">
+            <div class="edit-userprofile-form-body">
+                {% csrf_token %}
+                <input type="hidden" id="edit-userprofile-id" name="userprofile_id">
+                
+                <div class="edit-userprofile-note">
+                    * Indicates required
+                </div>
+
+                <div class="edit-userprofile-form-group">
+                    <label for="edit-userprofile-full-name">Full name <span class="edit-userprofile-required">*</span></label>
+                    <input type="text" id="edit-userprofile-full-name" name="full_name" placeholder="Enter your full name" required maxlength="100">
+                </div>
+
+                <div class="edit-userprofile-form-group">
+                    <label for="edit-userprofile-headline">Headline <span class="edit-userprofile-required">*</span></label>
+                    <input type="text" id="edit-userprofile-headline" name="headline" placeholder="Ex: Software Engineer at Google" required maxlength="220">
+                    <div class="edit-userprofile-char-count">
+                        <span id="edit-userprofile-headline-count">0</span> / 220
+                    </div>
+                </div>
+
+
+
+                <div class="edit-userprofile-form-group">
+                    <label for="edit-userprofile-location">Location</label>
+                    <input type="text" id="edit-userprofile-location" name="location" placeholder="Ex: London, United Kingdom" maxlength="100">
+                    <div class="edit-userprofile-help-text">
+                        Your city, region, or country
+                    </div>
+                </div>
+
+                <div class="edit-userprofile-form-group">
+                    <label for="edit-userprofile-phone">Phone</label>
+                    <input type="tel" id="edit-userprofile-phone" name="phone" placeholder="Ex: +44 20 1234 5678" maxlength="20">
+                    <div class="edit-userprofile-help-text">
+                        Your contact number (only visible to you)
+                    </div>
+                </div>
+
+                <div class="edit-userprofile-form-group">
+                    <label for="edit-userprofile-summary">Summary</label>
+                    <textarea id="edit-userprofile-summary" name="summary" placeholder="Write a summary to highlight your personality and work experience..." maxlength="2600"></textarea>
+                    <div class="edit-userprofile-char-count">
+                        <span id="edit-userprofile-summary-count">0</span> / 2,600
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-userprofile-form-footer">
+                <button type="submit" class="edit-userprofile-save-btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script>
+function toggleProfileMenu(event) {
+    event.preventDefault();
+    let menu = document.getElementById("profileMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+// Hide dropdown if clicked outside
+document.addEventListener("click", function(event) {
+    let menu = document.getElementById("profileMenu");
+    let button = document.querySelector(".profile-dropdown");
+    if (!button.contains(event.target)) {
+        menu.style.display = "none";
+    }
+});
+</script>
+<script src="{% static 'js/profile-add-experience.js' %}"></script>
+<script src="{% static 'js/profile-add-education.js' %}"></script>
+<script src="{% static 'js/profile-add-lc.js' %}"></script>
+<script src="{% static 'js/profile-edit-education.js' %}"></script>
+<script src="{% static 'js/profile-edit-experience.js' %}"></script>
+<script src="{% static 'js/edit-profile.js' %}"></script>
+</body>
+</html>

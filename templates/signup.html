@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Join LinkedIn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #f3f2ef;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #0a66c2;
+            margin: 20px 0 40px 0;
+            text-decoration: none;
+        }
+
+        .main-container {
+            background: white;
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .title {
+            font-size: 1.8rem;
+            font-weight: 400;
+            color: #000;
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.3;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.875rem;
+            color: #666;
+            margin-bottom: 6px;
+            font-weight: 400;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+            background-color: white;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #0a66c2;
+            box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.1);
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #0a66c2;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 600;
+            padding: 4px;
+        }
+
+        .password-toggle:hover {
+            text-decoration: underline;
+        }
+
+        .password-requirements {
+            font-size: 0.75rem;
+            color: #e74c3c;
+            margin-top: 4px;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: flex-start;
+            margin: 24px 0;
+            gap: 8px;
+        }
+
+        .checkbox-container input[type="checkbox"] {
+            width: auto;
+            margin: 0;
+            margin-top: 2px;
+        }
+
+        .checkbox-label {
+            font-size: 0.875rem;
+            color: #666;
+            line-height: 1.4;
+            flex: 1;
+        }
+
+        .checkbox-label a {
+            color: #0a66c2;
+            text-decoration: none;
+        }
+
+        .checkbox-label a:hover {
+            text-decoration: underline;
+        }
+
+        .submit-btn {
+            width: 100%;
+            background-color: #0a66c2;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .submit-btn:hover {
+            background-color: #084d8a;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            color: #666;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+
+        .divider span {
+            background-color: white;
+            padding: 0 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .google-signin {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            padding: 12px 24px;
+            border: 1px solid #ccc;
+            border-radius: 24px;
+            background-color: white;
+            color: #666;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            margin-bottom: 24px;
+        }
+
+        .google-signin:hover {
+            border-color: #999;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .google-icon {
+            width: 20px;
+            height: 20px;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTIyLjU2IDEyLjI1QzIyLjU2IDExLjQ3IDIyLjQ5IDEwLjcyIDIyLjM2IDEwSDE2VjE0LjI2SDIwLjA5QzE5LjkzIDE1LjEzIDE5LjQ1IDE1Ljg4IDE4LjczIDE2LjM3VjE4Ljc5SDIwLjczQzIxLjgxIDE3LjgxIDIyLjU2IDE1LjIyIDIyLjU2IDEyLjI1WiIgZmlsbD0iIzQyODVGNCIvPgo8cGF0aCBkPSJNMjIuNTYgMTIuMjVDMjIuNTYgMTEuNDcgMjIuNDkgMTAuNzIgMjIuMzYgMTBIMTZWMTQuMjZIMjAuMDlDMTkuOTMgMTUuMTMgMTkuNDUgMTUuODggMTguNzMgMTYuMzdWMTguNzlIMjAuNzNDMjEuODEgMTcuODEgMjIuNTYgMTUuMjIgMjIuNTYgMTIuMjVaIiBmaWxsPSIjNDI4NUY0Ii8+CjxwYXRoIGQ9Ik0yMi41NiAxMi4yNUMyMi41NiAxMS40NyAyMi40OSAxMC43MiAyMi4zNiAxMEgxNlYxNC4yNkgyMC4wOUMxOS45MyAxNS4xMyAxOS40NSAxNS44OCAxOC43MyAxNi4zN1YxOC43OUgyMC43M0MyMS44MSAxNy44MSAyMi41NiAxNS4yMiAyMi41NiAxMi4yNVoiIGZpbGw9IiM0Mjg1RjQiLz4KICA8cGF0aCBkPSJNMTYgMjJDMTguNDggMjIgMjAuNSAyMS4xIDIxLjgzIDE5LjE5TDE5LjczIDE2LjM3QzE5LjA1IDE2LjggMTguMjIgMTcuMDYgMTYgMTcuMDZDMTEuMzYgMTcuMDYgNy41NiAxNC4wNiA3LjU2IDEwSDVDNS41IDEyLjczIDguNDkgMjIgMTYgMjJaIiBmaWxsPSIjMzRBODUzIi8+CjxwYXRoIGQ9Ik0xNiAySDEzLjUyQzExLjE0IDIgOS4yIDMuOTQgOS4yIDYuMzJWMTBINS41NkM1LjE5IDEwIDQuODggOS42OSA0Ljg4IDkuMzJWOEM0Ljg4IDYuMDUgNy4wNyAzLjg2IDkuOCAzLjg2SDEzLjUyQzE0Ljg2IDMuODYgMTYgNSAxNiA2LjM0VjJaIiBmaWxsPSIjRUE0MzM1Ii8+CjxwYXRoIGQ9Ik0xNiA2LjM0VjJIMTMuNTJDMTEuMTQgMiA5LjIgMy45NCA5LjIgNi4zMlYxMEg1LjU2QzUuMTkgMTAgNC44OCA5LjY5IDQuODggOS4zMlY4QzQuODggNi4wNSA3LjA3IDMuODYgOS44IDMuODZIMTMuNTJDMTQuODYgMy44NiAxNiA1IDE2IDYuMzRaIiBmaWxsPSIjRkJCQzA1Ii8+Cjwvc3ZnPg==');
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .signin-link {
+            text-align: center;
+            font-size: 0.875rem;
+            color: #666;
+        }
+
+        .signin-link a {
+            color: #0a66c2;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .signin-link a:hover {
+            text-decoration: underline;
+        }
+
+        .footer-link {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 0.875rem;
+        }
+
+        .footer-link a {
+            color: #0a66c2;
+            text-decoration: none;
+        }
+
+        .footer-link a:hover {
+            text-decoration: underline;
+        }
+.messages {
+    margin-bottom: 15px;
+}
+
+.alert {
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.alert.success {
+    background-color: #e6ffed;
+    color: #1a7f37;
+    border: 1px solid #1a7f37;
+}
+
+.alert.error {
+    background-color: #ffe6e6;
+    color: #cc0000;
+    border: 1px solid #cc0000;
+}
+
+.alert.warning {
+    background-color: #fff8e1;
+    color: #b36b00;
+    border: 1px solid #b36b00;
+}
+
+.alert.info {
+    background-color: #e6f4ff;
+    color: #0059b3;
+    border: 1px solid #0059b3;
+}
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .logo {
+                font-size: 2rem;
+                margin: 10px 0 20px 0;
+            }
+
+            .main-container {
+                padding: 24px 20px;
+                border-radius: 8px;
+                box-shadow: none;
+                border: 1px solid #ddd;
+            }
+
+            .title {
+                font-size: 1.5rem;
+                margin-bottom: 24px;
+            }
+
+            .form-group {
+                margin-bottom: 16px;
+            }
+
+            .form-group input {
+                padding: 14px 12px;
+                font-size: 1.1rem;
+            }
+
+            .submit-btn {
+                padding: 14px 24px;
+                font-size: 1.1rem;
+                border-radius: 28px;
+            }
+
+            .google-signin {
+                padding: 14px 24px;
+                font-size: 1rem;
+                border-radius: 28px;
+            }
+        }
+
+        /* Very small mobile devices */
+        @media (max-width: 480px) {
+            .main-container {
+                padding: 20px 16px;
+            }
+
+            .title {
+                font-size: 1.3rem;
+                margin-bottom: 20px;
+            }
+
+            .checkbox-container {
+                margin: 20px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="#" class="logo">LinkedIn</a>
+    
+    <div class="main-container">
+        <h1 class="title">Make the most of your professional life</h1>
+        
+{% if messages %}
+  <div class="messages">
+    {% for message in messages %}
+      <div class="alert {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<form id="registrationForm" method="post" action="{% url 'create_account' %}">
+    {% csrf_token %}
+    <div class="form-group">
+        <label for="firstName">First name</label>
+        <input type="text" id="firstName" name="firstName" required>
+    </div>
+
+    <div class="form-group">
+        <label for="lastName">Last name</label>
+        <input type="text" id="lastName" name="lastName" required>
+    </div>
+
+    <div class="form-group">
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" required>
+    </div>
+
+    <div class="form-group">
+        <label for="phone">Phone number</label>
+        <input type="tel" id="phone" name="phone" required>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <div class="password-container">
+            <input type="password" id="password" name="password" required>
+            <button type="button" class="password-toggle" onclick="togglePassword()">Show</button>
+        </div>
+    </div>
+
+    <button type="submit" class="submit-btn">Agree & Join</button>
+</form>
+
+        <div class="divider">
+            <span>or</span>
+        </div>
+
+
+        <div class="signin-link">
+            Already on LinkedIn? <a href="login">Sign in</a>
+        </div>
+    </div>
+
+
+    <script>
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.querySelector('.password-toggle');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.textContent = 'Hide';
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.textContent = 'Show';
+            }
+        }
+</script>
+</body>
+</html>
