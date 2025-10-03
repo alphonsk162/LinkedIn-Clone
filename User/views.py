@@ -9,7 +9,7 @@ from django.http import JsonResponse
 from feed.models import Post, Like, Comment
 from User.models import ConnectionRequest, Connection
 from django.db.models import Q  
-from .helper_functions import find_connection_posts, find_connection_userprofiles, find_liked_posts, find_child_comments, find_parent_comments
+from .helper_functions import find_connection_posts, find_connection_userprofiles, find_liked_posts, find_child_comments, find_parent_comments, find_connection_count, find_user_posts
 # Create your views here.
 def login_page(request):
     return render(request, 'login.html')
@@ -80,6 +80,7 @@ def signin(request):
 def home(request):
     user = request.user
     user_profile = UserProfile.objects.get(user=user)
+    connection_count = find_connection_count(request.user)
     posts = find_connection_posts(request.user)
     parent_comments_map = {}
     for post in posts:
@@ -91,8 +92,14 @@ def home(request):
         for parent_comment in parent_comment_list:
             child_comments = parent_comment.replies.all().order_by('created_at')
             child_comments_map[parent_comment.id] = child_comments
-    print("child_comments_map:", child_comments_map)
-    context = {'user_profile': user_profile, 'posts': posts, 'liked_posts': liked_posts, 'parent_comments_map': parent_comments_map, 'child_comments_map': child_comments_map}
+    context =   {
+                'user_profile': user_profile, 
+                'posts': posts, 
+                'liked_posts': liked_posts, 
+                'parent_comments_map': parent_comments_map, 
+                'child_comments_map': child_comments_map,
+                'connection_count': connection_count,
+                }
     return render(request, 'home.html', context)  
 
 def add_comment(request):
@@ -391,9 +398,137 @@ def update_education(request, id):
         return redirect("profile")
 
 def view_profile(request, id):
+
     my_profile = request.user.userprofile
     user_profile = UserProfile.objects.get(id=id)
+    connection = False
+    received_request = False
+    sent_request = False
+    if user_profile != my_profile:
+        connection = Connection.objects.filter(
+            Q(user1=request.user, user2=user_profile.user) | 
+            Q(user1=user_profile.user, user2=request.user)
+        ).exists()
+        received_request = ConnectionRequest.objects.filter(
+            sender=user_profile.user,
+            receiver=request.user
+        ).exists()
+        sent_request = ConnectionRequest.objects.filter(
+            sender=request.user,
+            receiver=user_profile.user
+        ).exists()
     experience_list = Experience.objects.filter(userprofile=user_profile)
     education_list = Education.objects.filter(userprofile=user_profile)
-    context = {'experience_list': experience_list, 'education_list': education_list, 'user_profile': user_profile, 'my_profile': my_profile }
+    context = { 
+                'experience_list': experience_list, 
+                'education_list': education_list, 
+                'user_profile': user_profile, 
+                'my_profile': my_profile, 
+                'connection': connection,
+                'received_request': received_request,
+                'sent_request': sent_request
+                }
     return render(request, 'view_profile.html', context)
+
+
+
+def user_activity(request):
+    filter_option = request.GET.get('filter', 'posts')
+    if filter_option == 'posts':
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        connection_count = find_connection_count(request.user)
+        posts = find_user_posts(request.user)
+        parent_comments_map = {}
+        for post in posts:
+            parent_comments = find_parent_comments(post)
+            parent_comments_map[post.id] = parent_comments
+        liked_posts = find_liked_posts(request.user)
+        child_comments_map = {}
+        for parent_comment_list in parent_comments_map.values():
+            for parent_comment in parent_comment_list:
+                child_comments = parent_comment.replies.all().order_by('created_at')
+                child_comments_map[parent_comment.id] = child_comments
+        print("child_comments_map:", child_comments_map)
+        context =   {
+                    'user_profile': user_profile, 
+                    'posts': posts, 
+                    'liked_posts': liked_posts, 
+                    'parent_comments_map': parent_comments_map, 
+                    'child_comments_map': child_comments_map,
+                    'connection_count': connection_count,
+                    'filter_option': filter_option,
+                    }
+        return render(request, 'my_activity.html', context)
+    elif filter_option == 'comments':
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        liked_posts = find_liked_posts(request.user)
+        connection_count = find_connection_count(request.user)
+        user_comments = Comment.objects.filter(user=user_profile)
+        parent_comments = Comment.objects.filter(id__in=user_comments.values_list("parent_id", flat=True))
+        comments = (user_comments | parent_comments).order_by('-created_at')
+        commented_posts = []
+        commented_posts_set = set()
+        for comment in comments:
+            if comment.post not in commented_posts_set:
+                commented_posts.append(comment.post)
+                commented_posts_set.add(comment.post)
+        parent_comments_map = {}
+        for post in commented_posts:
+            for comment in comments:
+                if comment.post == post and comment.parent is None:
+                    if post.id not in parent_comments_map:
+                        parent_comments_map[post.id] = []
+                    parent_comments_map[post.id].append(comment)
+        
+        child_comments_map = {}
+        for parent_comment_list in parent_comments_map.values():
+            for parent_comment in parent_comment_list:
+                child_comments = parent_comment.replies.all().order_by('created_at')
+                child_comments_map[parent_comment.id] = child_comments
+        context =   {
+                    'user_profile': user_profile, 
+                    'posts': commented_posts, 
+                    'liked_posts': liked_posts, 
+                    'parent_comments_map': parent_comments_map, 
+                    'child_comments_map': child_comments_map,
+                    'connection_count': connection_count,
+                    'filter_option': filter_option,
+                    }
+        return render(request, 'my_activity.html', context)
+    else:
+        user = request.user
+        user_profile = UserProfile.objects.get(user=user)
+        connection_count = find_connection_count(request.user)
+        # liked_posts= Post.objects.filter(
+        #     id__in=Like.objects.filter(user=user_profile).values_list('post_id', flat=True)
+        # )
+        posts = find_liked_posts(request.user)
+        parent_comments_map = {}
+        for post in posts:
+            parent_comments = find_parent_comments(post)
+            parent_comments_map[post.id] = parent_comments
+        child_comments_map = {}
+        for parent_comment_list in parent_comments_map.values():
+            for parent_comment in parent_comment_list:
+                child_comments = parent_comment.replies.all().order_by('created_at')
+                child_comments_map[parent_comment.id] = child_comments
+        print("child_comments_map:", child_comments_map)
+        context =   {
+                    'user_profile': user_profile, 
+                    'posts': posts, 
+                    'liked_posts': posts, 
+                    'parent_comments_map': parent_comments_map, 
+                    'child_comments_map': child_comments_map,
+                    'connection_count': connection_count,
+                    'filter_option': filter_option,
+                    }
+        return render(request, 'my_activity.html', context)
+
+def delete_post(request, id):
+    post = get_object_or_404(Post, id=id, user=request.user.userprofile)
+    post.delete()
+    return redirect("user_activity")
+
+

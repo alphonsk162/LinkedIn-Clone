@@ -23,4 +23,6 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('view_profile/<int:id>/', views.view_profile, name='view_profile'),
     path('add_comment',views.add_comment,name='add_comment'),
+    path('user_activity',views.user_activity,name='user_activity'),
+    path('delete_post/<int:id>/', views.delete_post, name='delete_post'),
 ]

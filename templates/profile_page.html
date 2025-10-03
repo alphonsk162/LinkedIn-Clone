@@ -559,6 +559,36 @@
                 display: none;
             }
         }
+
+
+.activity-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0a66c2;
+    text-decoration: none;
+    border: 1px solid #0a66c2;
+    border-radius: 16px;
+    background-color: transparent;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.activity-link:hover {
+    background-color: rgba(112, 181, 249, 0.15);
+    border-color: #004182;
+    color: #004182;
+}
+
+.activity-link i {
+    font-size: 16px;
+}
+
+
+
     </style>
 </head>
 <body>
@@ -572,11 +602,11 @@
             </div>
 
             <nav class="nav-menu">
-                <a href="#" class="nav-item" onclick="toggleProfileMenu(event)">
+                <a href="home" class="nav-item" >
                     <span class="nav-icon"><i class="fa-solid fa-home"></i></span>
                     <span>Home</span>
                 </a>
-                <a href="#" class="nav-item">
+                <a href="my_connections" class="nav-item">
                     <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
                     <span>My Network</span>
                 </a>
@@ -617,6 +647,21 @@
                             {% endif %}
                         </div>
                         <a href="profile" class="view-profile-btn">View Profile</a>
+                        <form method="POST" action="{% url 'logout' %}" style="margin: 0; padding: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="signout-btn" style="
+                                width: 100%;
+                                background: none;
+                                border: none;
+                                padding: 10px;
+                                text-align: center;
+                                cursor: pointer;
+                                font-size: 14px;
+                                color: #333;
+                            ">
+                                Sign Out
+                            </button>
+                        </form>
                     </div>
                 </div>
             </nav>
@@ -679,10 +724,15 @@
                         <p class="contact-info">Contact info</p> -->
                     </div>
                     <div>
-
+                    <div style="display: flex; flex-direction: column; gap: 40px; align-items: flex-end;">
                     <button class="edit-btn" onclick="openEditUserProfileModal({{ user_profile.id }})">
                         <i class="fas fa-pen"></i>
                     </button>
+                    <a href="user_activity" class="activity-link">
+                        <i class="fas fa-chart-line"></i> My Activity
+                    </a>
+                    </div>
+
                     </div>
                     </div>
                 </div>
@@ -859,16 +909,16 @@
 
 
         <!-- Education Section -->
-        <div class="section">
-            <div class="section-header">
-                <h2 class="section-title">Education</h2>
-                <div style="display: flex; align-items: center;">
-                    <button class="add-btn" onclick="openEducationModal(this)">
-                        <i class="fas fa-plus"></i>
-                    </button>
+<div class="section">
+    <div class="section-header">
+        <h2 class="section-title">Education</h2>
+        <div style="display: flex; align-items: center;">
+            <button class="add-btn" onclick="openEducationModal(this)">
+                <i class="fas fa-plus"></i>
+            </button>
 
-                </div>
-            </div>
+        </div>
+    </div>
             
 <div class="experience-item" style="width:95%; margin-left: 2.5%; justify-content: space-around; display: flex; flex-direction: column; margin-top: 25px; gap: 15px;">
     {% for education in education_list %}  

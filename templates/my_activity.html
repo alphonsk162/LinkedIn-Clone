@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="{% static 'css/post-section.css' %}">
     <link rel="stylesheet" href="{% static 'css/comments-section.css' %}">
     <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/edit-post.css' %}">
     <style>
         * {
             margin: 0;
@@ -225,120 +226,107 @@
     font-weight: 600;
 }
 
-        /* Main Feed */
-        /* .feed {
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
+.post-options-container {
+            position: relative;
+            display: inline-block;
         }
 
-        .create-post {
-            padding: 16px 20px;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .post-input-container {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 16px;
-        }
-
-        .post-avatar {
-            width: 48px;
-            height: 48px;
-            border-radius: 50%;
-            background: #ddd;
+        .post-options-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            color: #666;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background-color: transparent;
+            color: rgba(0, 0, 0, 0.6);
+            cursor: pointer;
+            transition: all 0.2s ease;
             font-size: 18px;
         }
 
-        .post-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #ccc;
-            border-radius: 24px;
-            font-size: 14px;
-            cursor: pointer;
-            background: transparent;
+        .post-options-btn:hover {
+            background-color: rgba(0, 0, 0, 0.08);
+            color: rgba(0, 0, 0, 0.9);
         }
 
-        .post-input:hover {
-            background: #f3f2ef;
+        /* Post Dropdown Menu */
+        .post-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            margin-top: 4px;
+            background-color: #fff;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 160px;
+            z-index: 1000;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.2s ease;
         }
 
-        .post-actions {
-            display: flex;
-            justify-content: space-around;
+        .post-dropdown-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
         }
 
-        .post-action {
+        .post-dropdown-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            border-radius: 4px;
-            cursor: pointer;
+            gap: 12px;
+            padding: 12px 16px;
             font-size: 14px;
-            font-weight: 600;
-            color: #666;
-        }
-
-        .post-action:hover {
-            background: #f3f2ef;
-        }
-
-        .action-icon {
-            font-size: 18px;
-        } */
-
-        /* Right Sidebar */
-        .right-sidebar {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .sidebar-card {
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            overflow: hidden;
-        }
-
-        .sidebar-header {
-            padding: 16px 16px 12px;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .news-item {
-            padding: 8px 16px;
+            color: rgba(0, 0, 0, 0.9);
+            text-decoration: none;
             cursor: pointer;
-            border-bottom: 1px solid #f3f2ef;
+            transition: background-color 0.15s ease;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            font-family: inherit;
         }
 
-        .news-item:hover {
-            background: #f3f2ef;
+        .post-dropdown-item:hover {
+            background-color: rgba(0, 0, 0, 0.08);
         }
 
-        .news-item:last-child {
-            border-bottom: none;
+        .post-dropdown-item i {
+            font-size: 16px;
+            width: 16px;
+            text-align: center;
         }
 
-        .news-title {
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 2px;
+        .post-dropdown-item.delete {
+            color: #cc1016;
         }
 
-        .news-meta {
-            font-size: 12px;
-            color: #666;
+        .post-dropdown-item.delete:hover {
+            background-color: rgba(204, 16, 22, 0.08);
         }
 
+        /* Overlay to close dropdown when clicking outside */
+        .post-dropdown-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 999;
+            display: none;
+        }
+
+        .post-dropdown-overlay.show {
+            display: block;
+        }
+
+       
         /* Mobile Styles */
         @media (max-width: 768px) {
             .header-content {
@@ -542,6 +530,76 @@
     padding-top: 5px;
 }
 
+
+
+
+
+.activity-header {
+    background: white;
+    padding: 1.5rem 1.5rem 1rem;
+    margin-bottom: 0.5rem;
+    width: 400px;
+}
+
+.activity-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.9);
+    margin: 0 0 1rem 0;
+    line-height: 1.5;
+}
+
+.activity-filters {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.filter-pill {
+    padding: 0.5rem 1.25rem;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.6);
+    border-radius: 20px;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.6);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.filter-pill:hover {
+    background: rgba(0, 0, 0, 0.08);
+    border-color: rgba(0, 0, 0, 0.75);
+    color: rgba(0, 0, 0, 0.9);
+}
+
+.filter-pill.active {
+    background: #01754f;
+    border-color: #01754f;
+    color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .activity-header {
+        padding: 1.25rem 1rem 0.75rem;
+    }
+    
+    .activity-title {
+        font-size: 1.125rem;
+    }
+    
+    .filter-pill {
+        padding: 0.45rem 1.125rem;
+        font-size: 0.875rem;
+    }
+
+}
+
+
     </style>
 </head>
 <body>
@@ -559,7 +617,7 @@
             </div>
 
             <nav class="nav-menu">
-                <a href="" class="nav-item active" onclick="toggleProfileMenu(event)">
+                <a href="home" class="nav-item" >
                     <span class="nav-icon"><i class="fa-solid fa-home"></i></span>
                     <span>Home</span>
                 </a>
@@ -567,7 +625,7 @@
                     <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
                     <span>My Network</span>
                 </a>
-                <a href="{% url 'user_activity' %}" class="nav-item">
+                <a href="{% url 'user_activity' %}" class="nav-item active">
                     <span class="nav-icon"><i class="fa-solid fa-list-check"></i></span>
                     <span>My Activity</span>
                 </a>
@@ -667,7 +725,7 @@
 
     <!-- Main Feed -->
     <div class="feed">
-        <div class="create-post">
+        <!-- <div class="create-post">
             <div class="post-input-container">
                 <div class="post-avatar">
                 <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
@@ -678,9 +736,25 @@
                     <i class="fa-solid fa-image"></i>
                 </button>
             </div>
+        </div> -->
+        <div class="activity-header">
+            <h1 class="activity-title">All activity</h1>
+    <div class="activity-filters">
+        <a href="{% url 'user_activity' %}?filter=posts" class="filter-pill {% if filter_option == 'posts' %}active{% endif %}">
+            Posts
+        </a>
+        <a href="{% url 'user_activity' %}?filter=comments" class="filter-pill {% if filter_option == 'comments' %}active{% endif %}">
+            Comments
+        </a>
+        <a href="{% url 'user_activity' %}?filter=reactions" class="filter-pill {% if filter_option == 'reactions' %}active{% endif %}">
+            Reactions
+        </a>
+    </div>
         </div>
+
         <hr class="divider">
         {% for post in posts %}
+
         <div class="post-card">
                 <div class="post-header">
                     <div class="post-author">
@@ -691,33 +765,99 @@
                             <p class="post-timestamp"> {{ post.created_at|naturaltime }}• <i class="fa-solid fa-earth-americas"></i></p>
                         </div>
                     </div>
-                    <!-- <button class="post-options-btn">
+                <div class="post-options-container" style="display:{% if post.user == user_profile %}block{% else %}none{% endif %};">
+                    <button class="post-options-btn" onclick="togglePostDropdown(this)">
                         <i class="fa-solid fa-ellipsis"></i>
-                    </button> -->
-                </div>
-
-                <div class="post-content">
-                    <p class="post-text">{{post.content}}</p>
-                </div>
-
-                <div class="post-image">
-                    <img src="{{post.image.url }}"  alt="Post image">
-
-                </div>
-
-                <!-- <div class="post-stats">
-                    <div class="post-reactions">
-                        <div class="reaction-icons">
-                            <span class="reaction-icon like-icon">👍</span>
-                            <span class="reaction-icon celebrate-icon">🎉</span>
-                            <span class="reaction-icon love-icon">❤️</span>
-                        </div>
-                        <span class="reaction-count">245</span>
+                    </button>
+                    
+                    <!-- Post Dropdown Menu -->
+                    <div class="post-dropdown-menu">
+                        <button class="post-dropdown-item" 
+                                onclick="showEditForm(this)" 
+                                data-post-content="{{post.content}}" 
+                                data-post-image="{{post.image.url}}">
+                            <i class="fa-solid fa-pen"></i>
+                            <span>Edit</span>
+                        </button>
+                        <form method="post" action="{% url 'delete_post' post.id %}">
+                        {% csrf_token %}
+                        <button class="post-dropdown-item delete" type="submit">
+                            <i class="fa-solid fa-trash"></i>
+                            <span>Delete</span>
+                        </button>
+                        </form>
                     </div>
-                    <div class="post-comments-shares">
-                        <span>18 comments</span>
-                    </div>
-                </div> -->
+                </div>
+                </div>
+                <div class="post-dropdown-overlay" onclick="closeAllPostDropdowns()"></div>
+
+
+
+
+
+
+
+    <div class="post-view">
+        <div class="post-content">
+            <p class="post-text">{{post.content}}</p>
+        </div>
+
+        <div class="post-image">
+            <img src="{{post.image.url}}" alt="Post image">
+        </div>
+    </div>
+
+
+
+<div class="post-edit-form" style="display: none;">
+        <form method="post" action="{% url 'edit_post' post.id %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="edit-form-group">
+                <label for="edit-content-{{ post.id }}">Share your thoughts</label>
+                <textarea 
+                    id="edit-content-{{ post.id }}" 
+                    name="content" 
+                    class="edit-textarea" 
+                    rows="4"
+                ></textarea>
+            </div>
+
+            <div class="edit-form-group">
+                <label>Your post preview</label>
+                <div class="edit-image-preview">
+                    <img src="" alt="Current post image" class="edit-preview-img">
+                </div>
+            </div>
+
+            <div class="edit-form-group">
+                <label for="edit-image-{{ post.id }}">Update photo</label>
+                <input 
+                    type="file" 
+                    id="edit-image-{{ post.id }}" 
+                    name="image" 
+                    accept="image/*"
+                    class="edit-file-input"
+                    onchange="previewNewImage(this)"
+                >
+                <div class="new-image-preview" style="display: none;">
+                    <p class="preview-label">New Image Preview:</p>
+                    <img src="" alt="New image preview" class="new-preview-img">
+                </div>
+            </div>
+
+            <div class="edit-form-actions">
+                <button type="submit" class="btn-save-changes">
+                    <i class="fa-solid fa-check"></i>
+                    Make Changes
+                </button>
+                <button type="button" class="btn-cancel-edit" onclick="cancelEdit(this)">
+                    <i class="fa-solid fa-xmark"></i>
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
 
                 <div class="post-actions">
                     <button class="action-btn like-btn {% if post in liked_posts %}liked{% endif %}"  onclick="toggleLike(this)" data-post-id="{{ post.id }}">
@@ -740,7 +880,9 @@
 
 
 
-<div class="comments-section" style="display: none;">
+
+
+<div class="comments-section" style="{% if filter_option == 'comments' %}display: block;{% else %}display: none;{% endif %}">
     
     <!-- Add Comment Form -->
     <div class="add-comment-container">
@@ -844,7 +986,7 @@
 
             </div>
         {% endfor %}
-    </div>
+</div>
 
 
 
@@ -1013,9 +1155,73 @@ document.addEventListener("click", function(event) {
         menu.style.display = "none";
     }
 });
-    </script>
+
+
+function togglePostDropdown(button) {
+            // Get the post dropdown menu
+            const container = button.parentElement;
+            const dropdown = container.querySelector('.post-dropdown-menu');
+            const overlay = document.querySelector('.post-dropdown-overlay');
+            
+            // Close all other post dropdowns first
+            closeAllPostDropdowns();
+            
+            // Toggle current dropdown
+            const isVisible = dropdown.classList.contains('show');
+            
+            if (!isVisible) {
+                dropdown.classList.add('show');
+                overlay.classList.add('show');
+            }
+        }
+
+        function closeAllPostDropdowns() {
+            const allDropdowns = document.querySelectorAll('.post-dropdown-menu');
+            const overlay = document.querySelector('.post-dropdown-overlay');
+            
+            allDropdowns.forEach(dropdown => {
+                dropdown.classList.remove('show');
+            });
+            
+            overlay.classList.remove('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const isClickInside = event.target.closest('.post-options-container');
+            
+            if (!isClickInside) {
+                closeAllPostDropdowns();
+            }
+        });
+
+        // Close dropdown on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeAllPostDropdowns();
+            }
+        });
+
+document.querySelectorAll('.filter-pill').forEach(pill => {
+    pill.addEventListener('click', function() {
+        // Remove active class from all pills
+        document.querySelectorAll('.filter-pill').forEach(p => p.classList.remove('active'));
+        
+        // Add active class to clicked pill
+        this.classList.add('active');
+        
+        // Get filter value
+        const filter = this.getAttribute('data-filter');
+        
+        // Add your filtering logic here
+        console.log('Filter selected:', filter);
+    });
+});
+</script>
+
 <script src="{% static 'js/home-post-photo.js' %}"></script>
 <script src="{% static 'js/home-feed.js' %}"></script>
 <script src="{% static 'js/comments-section.js' %}"></script>
+<script src="{% static 'js/edit-post.js' %}"></script>
 </body>
 </html>

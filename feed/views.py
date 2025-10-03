@@ -29,10 +29,6 @@ def search_results(request):
             connections.append(connection_obj.user2)
         else:
             connections.append(connection_obj.user1)
-    print(search_results)
-    print(received_requests)
-    print(sent_requests)
-    print(connections)
     context = {'search_results': search_results, 'request_receivers': receivers, 'request_senders': senders, 'connections':connections}
     return render(request, 'search_results.html', context)
 
@@ -77,6 +73,27 @@ def delete_connection_request(request, receiver_id):
         except ConnectionRequest.DoesNotExist:
             return JsonResponse({"success": False, "error": "Connection request does not exist"})
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+@login_required
+def delete_connection(request, user_id):
+    if request.method == "POST":
+        try:
+            other_user = UserProfile.objects.get(id=user_id).user
+            # other_user = User.objects.get(id=user_id)
+            connection = Connection.objects.filter(
+                (Q(user1=request.user) & Q(user2=other_user)) |
+                (Q(user1=other_user) & Q(user2=request.user))
+            ).first()
+
+            if connection:
+                connection.delete()
+                return JsonResponse({"success": True})
+            else:
+                return JsonResponse({"success": False, "error": "Connection not found."})
+        except User.DoesNotExist:
+            return JsonResponse({"success": False, "error": "User does not exist."})
+
+    return JsonResponse({"success": False, "error": "Invalid request method."})
 
 @login_required
 def accept_connection_request(request):
@@ -143,6 +160,38 @@ def toggle_like_post(request):
 
 def comment_page(request):
         return render(request, "comments_page.html")
+
+def my_connections(request):
+    user = request.user
+    user_profile = request.user.userprofile
+    connections = Connection.objects.filter(
+    Q(user1=user) | Q(user2=user))
+    connected_users = []
+    for connection in connections:
+        if connection.user1 == user:
+            connected_users.append(connection.user2.userprofile)
+        else:
+            connected_users.append(connection.user1.userprofile)
+    print(connected_users)
+    pending_requests = ConnectionRequest.objects.filter(receiver=request.user)
+    pending_users = []
+    for req in pending_requests:
+        pending_users.append(req.sender.userprofile)
+    context = {'connections': connected_users, 'pending_requests': pending_users, 'user_profile': user_profile}
+    return render(request, 'my_networks.html', context)
+
+def edit_post(request, id):
+    post = get_object_or_404(Post, id=id, user=request.user.userprofile)
+    content = request.POST.get("content")
+    image = request.FILES.get("image")
+
+    post.content = content
+    if image:
+        post.image = image
+    post.save()
+
+    return redirect("user_activity")
+
 
 
 

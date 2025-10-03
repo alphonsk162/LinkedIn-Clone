@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <title>Professional Profile</title>
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <link rel="stylesheet" href="{% static 'css/search_results.css' %}">
     <style>
         * {
             margin: 0;
@@ -612,6 +613,21 @@
                             {% endif %}
                         </div>
                         <a href="profile" class="view-profile-btn">View Profile</a>
+                        <form method="POST" action="{% url 'logout' %}" style="margin: 0; padding: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="signout-btn" style="
+                                width: 100%;
+                                background: none;
+                                border: none;
+                                padding: 10px;
+                                text-align: center;
+                                cursor: pointer;
+                                font-size: 14px;
+                                color: #333;
+                            ">
+                                Sign Out
+                            </button>
+                        </form>
                     </div>
                 </div>
             </nav>
@@ -650,6 +666,24 @@
                         {% endif %}
                         <!-- <p class="profile-connections">500+ connections</p>
                         <p class="contact-info">Contact info</p> -->
+                    {% if received_request %}
+                    <div class="profile-actions">
+                        <button class="btn btn-accept" onclick="acceptRequest(this)" data-sender-id="{{user_profile.id}}">Accept</button>
+                        <button class="btn btn-ignore" onclick="ignoreRequest(this)" data-sender-id="{{user_profile.id}}">Ignore</button>
+                    </div>
+                    {% elif sent_request %}
+                    <div class="profile-actions">
+                        <button class="btn btn-pending" onclick="toggleConnect(this)" data-user-id="{{user_profile.id}}">Pending</button>
+                    </div>
+                    {% elif connection %}
+                    <div class="profile-actions">
+                        <button class="btn btn-connected"  onclick="toggleConnect(this)" data-user-id="{{user_profile.id}}" >Connected</button>
+                    </div>
+                    {% else %}
+                    <div class="profile-actions">
+                        <button class="btn btn-connect" onclick="toggleConnect(this)" data-user-id="{{user_profile.id}}">Connect</button>
+                    </div>
+                    {% endif %}
                     </div>
                     <div>
                     </div>
@@ -745,6 +779,142 @@ document.addEventListener("click", function(event) {
         menu.style.display = "none";
     }
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+const csrftoken = document.querySelector('meta[name="csrf-token"]').content;
+function toggleConnect(btn) {
+    const receiverId = btn.dataset.userId; // using data-user-id
+
+    if (btn.classList.contains('btn-connect')) {
+        // Send connection request
+        fetch(`/send_request/${receiverId}/`, {
+            method: "POST",
+            headers: {
+                "X-CSRFToken": csrftoken,
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({})
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                btn.textContent = 'Pending';
+                btn.className = 'btn btn-pending';
+            } else {
+                alert(data.message);
+            }
+        });
+    }
+    else if (btn.classList.contains('btn-pending')) {
+        // Cancel pending request
+        fetch(`/delete_request/${receiverId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                btn.textContent = 'Connect';
+                btn.className = 'btn btn-connect';
+            } else {
+                alert(data.error || 'Failed to cancel request');
+            }
+        });
+    }
+    else if (btn.classList.contains('btn-connected')) {
+        // Delete existing connection
+        fetch(`/delete_connection/${receiverId}/`, {
+            method: 'POST',
+            headers: { 'X-CSRFToken': csrftoken }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                btn.textContent = 'Connect';
+                btn.className = 'btn btn-connect';
+            } else {
+                alert(data.error || 'Failed to remove connection');
+            }
+        });
+    }
+}
+
+
+        // Accept request - hide the actions
+        function acceptRequest(btn) {
+            const actionsDiv = btn.closest('.profile-actions');
+            actionsDiv.classList.add('hidden');
+            const senderId = btn.dataset.senderId;
+
+            fetch("/accept-request/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                    "X-CSRFToken": csrftoken,
+                },
+                body: `sender_id=${senderId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.message);
+            });
+        }
+
+        // Ignore request - hide the actions
+        // function ignoreRequest(btn) {
+        //     const actionsDiv = btn.closest('.profile-actions');
+        //     actionsDiv.classList.add('hidden');
+        // }
+
+        function ignoreRequest(btn) {
+            const actionsDiv = btn.closest('.profile-actions');
+            actionsDiv.innerHTML = '<button class="btn btn-connect" onclick="toggleConnect(this)">Connect</button>';
+            const receiverId = btn.dataset.senderId;
+            const csrftoken = getCookie('csrftoken');
+
+            fetch(`/delete_request/${receiverId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    btn.textContent = 'Connect';
+                    btn.className = 'btn btn-connect';
+                } else {
+                    alert(data.error || 'Failed to cancel request');
+                }
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
 </script>
 
 </body>

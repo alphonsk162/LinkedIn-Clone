@@ -39,3 +39,11 @@ def find_child_comments(parent_comments):
         if child_comment.parent in child_comments_dict:
             child_comments_dict[child_comment.parent].append(child_comment)
     return child_comments_dict
+
+def find_connection_count(user):
+    connections = Connection.objects.filter(
+        Q(user1=user) | Q(user2=user))
+    return connections.count()
+
+def find_user_posts(user):
+    return Post.objects.filter(user=user.userprofile).order_by('-created_at')

@@ -5,7 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Search Results - LinkedIn</title>
-    <!-- <link rel="stylesheet" href="{% static 'css/search_results.css' %}"> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{% static 'css/header.css' %}">
+    <link rel="stylesheet" href="{% static 'css/edit-post.css' %}">
     <style>
                 * {
             margin: 0;
@@ -272,27 +274,134 @@
                 padding: 5px 14px;
             }
         }
+
+
+        .section-header {
+            padding: 16px 16px 12px 16px;
+            background-color: #fff;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .section-header h1 {
+            font-size: 20px;
+            font-weight: 600;
+            color: rgba(0, 0, 0, 0.9);
+            margin-bottom: 4px;
+        }
+
+        .section-subheader {
+            font-size: 14px;
+            color: rgba(0, 0, 0, 0.6);
+            font-weight: 400;
+            margin-top: 4px;
+        }
+        .section-divider {
+            height: 12px;
+            background-color: #f3f2ef;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
     </style>
 </head>
 
 <body>
-    <div class="header">
+<header class="header">
         <div class="header-content">
-            <div class="logo">in</div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search">
+            <a href="#" class="logo">in</a>
+            
+            <div class="search-box">
+                <form method="POST" action="search_results">
+                {% csrf_token %}
+                <span class="search-icon"> <button type="submit" style="background:none; border:none; cursor:pointer;"><i class="fa-solid fa-search"></i></button></span>
+                <input type="text" class="search-input" name="search_input" placeholder="Search">
+                </form>
+            </div>
+
+            <nav class="nav-menu">
+                <a href="home" class="nav-item" >
+                    <span class="nav-icon"><i class="fa-solid fa-home"></i></span>
+                    <span>Home</span>
+                </a>
+                <a href="my_connections" class="nav-item active">
+                    <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                    <span>My Network</span>
+                </a>
+                <a href="{% url 'user_activity' %}" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-list-check"></i></span>
+                    <span>My Activity</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-comment-dots"></i></span>
+                    <span>Messaging</span>
+                </a>
+                <a href="#" class="nav-item">
+                    <span class="nav-icon"><i class="fa-solid fa-bell"></i></span>
+                    <span>Notifications</span>
+                </a>
+                <!-- <a href="#" class="nav-item profile-dropdown" onclick="toggleProfileMenu(event)">
+                    <span class="nav-icon" style="margin-top: 2px; margin-bottom: -2px;"><img src="https://avatar.iran.liara.run/public" alt="Your Profile" style="width: 24px; height: 24px; border-radius: 50%; "></span>
+                    <span>Me ▼</span>
+                </a> -->
+
+                <div class="nav-item profile-dropdown">
+                    <a href="#" class="nav-item-profile" onclick="toggleProfileMenu(event)">
+                        <span class="nav-icon" style="margin-top: 2px; margin-bottom: -2px;">
+                       <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 24px; height: 24px; border-radius: 50%;">
+                        </span>
+                        <span>Me ▼</span>
+                    </a>
+
+                    <!-- Dropdown -->
+                    <div id="profileMenu" class="dropdown-menu">
+                        <div class="profile-preview">
+                        <img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;">
+                            <h4>{{user_profile.full_name}}</h4>
+                            {% if user_profile.headline %}
+                            <p>{{user_profile.headline}}</p>
+                            {% endif %}
+                        </div>
+                        <a href="profile" class="view-profile-btn">View Profile</a>
+                        <form method="POST" action="{% url 'logout' %}" style="margin: 0; padding: 0;">
+                            {% csrf_token %}
+                            <button type="submit" class="signout-btn" style="
+                                width: 100%;
+                                background: none;
+                                border: none;
+                                padding: 10px;
+                                text-align: center;
+                                cursor: pointer;
+                                font-size: 14px;
+                                color: #333;
+                            ">
+                                Sign Out
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </nav>
+
+
+
+            <div class="mobile-profile-pic" onclick="toggleProfileSidebar()">
+                👤
             </div>
         </div>
-    </div>
+    </header>
 
     <div class="container">
         <main class="main-content">
-            <!-- <div class="results-header">
-                <p class="results-count">About 6 results</p>
-            </div> -->
-
-            <!-- Profile 1: Connect state -->
-            {% for profile in search_results %}
+            <div class="section-header">
+                <h1>Invitations</h1>
+                <div class="section-subheader">Manage your received invitations ({{ pending_requests|length }})</div>
+            </div>
+            {% if pending_requests %}
+            {% for profile in pending_requests %}
             <a href="{% url 'view_profile' profile.id %}" style="text-decoration: none; color: inherit;">
             <div class="profile-card">
                 
@@ -307,42 +416,64 @@
                         {% if profile.location %}
                         <div class="profile-location">{{profile.location}}</div>
                         {% endif %}
-                        <!-- <div class="profile-mutual">12 mutual connections</div> -->
                     </div>
-                    {% if profile.user in request_senders %}
+
                     <div class="profile-actions">
                         <button class="btn btn-accept" onclick="acceptRequest(this)" data-sender-id="{{ profile.id }}">Accept</button>
                         <button class="btn btn-ignore" onclick="ignoreRequest(this)" data-sender-id="{{ profile.id }}">Ignore</button>
                     </div>
-                    {% elif profile.user in request_receivers %}
-                    <div class="profile-actions">
-                        <button class="btn btn-pending" onclick="toggleConnect(this)" data-receiver-id="{{ profile.id }}">Pending</button>
-                    </div>
-                    {% elif profile.user in connections %}
-                    <div class="profile-actions">
-                        <button class="btn btn-pending" style="display:none" onclick="toggleConnect(this)"></button>
-                    </div>
-                    {% else %}
-                    <div class="profile-actions">
-                        <button class="btn btn-connect" onclick="toggleConnect(this)" data-receiver-id="{{ profile.id }}">Connect</button>
-                    </div>
-                    {% endif %}
+
                 </div>
             </div>
             </a>
             {% endfor %}
-
-
-
-
-
-
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-solid fa-user-clock"></i></div>
+                <h2>No Pending Requests</h2>
+                <p>You have no pending connection requests at the moment.</p>
+            </div>
+            {% endif %}
+<div class="section-divider"></div>
+            <div class="section-header">
+                <h1>Connections</h1>
+                <div class="section-subheader">{{ connections|length }} connection{{ connections|length|pluralize }}</div>
+            </div>
+            {% if connections %}
+            {% for profile in connections %}
+            <a href="{% url 'view_profile' profile.id %}" style="text-decoration: none; color: inherit;">
+            <div class="profile-card">
+                
+            <div class="profile-avatar"><img src="{% if user_profile.profile_photo %}{{ user_profile.profile_photo.url }}{% else %}{% static 'images/default-profile.png' %}{% endif %}" 
+    alt="Profile Picture" style="width: 60px; height: 60px; border-radius: 50%; margin-bottom: 10px;"></div>
+                <div class="profile-content">
+                    <div class="profile-info">
+                        <div class="profile-name">{{profile.full_name}}</div>
+                        {% if profile.headline %}
+                        <div class="profile-headline">{{profile.headline}}</div>
+                        {% endif %}
+                        {% if profile.location %}
+                        <div class="profile-location">{{profile.location}}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            </a>
+            {% endfor %}
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-state-icon"><i class="fa-solid fa-user-friends"></i></div>
+                <h2>No Connections</h2>
+                <p>You have no connections at the moment. Start connecting with professionals!</p>
+            </div>
+            {% endif %}
 
         </main>
     </div>
 <meta name="csrf-token" content="{{ csrf_token }}">
 
     <script>
+
 document.addEventListener('DOMContentLoaded', function() {
     // Prevent link navigation when clicking buttons
     document.querySelectorAll('.profile-actions button').forEach(button => {
@@ -352,6 +483,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
 
         const csrftoken = document.querySelector('meta[name="csrf-token"]').content;
         function toggleConnect(btn) {
@@ -401,6 +533,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Accept request - hide the actions
         function acceptRequest(btn) {
+            const profileCard = btn.closest('.profile-card');
             const actionsDiv = btn.closest('.profile-actions');
             actionsDiv.classList.add('hidden');
             const senderId = btn.dataset.senderId;
@@ -415,6 +548,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .then(response => response.json())
             .then(data => {
+                profileCard.remove();
                 console.log(data.message);
             });
         }
@@ -426,6 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // }
 
         function ignoreRequest(btn) {
+            const profileCard = btn.closest('.profile-card');
             const actionsDiv = btn.closest('.profile-actions');
             actionsDiv.innerHTML = '<button class="btn btn-connect" onclick="toggleConnect(this)">Connect</button>';
             const receiverId = btn.dataset.senderId;
@@ -440,6 +575,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
+                    profileCard.remove();
                     btn.textContent = 'Connect';
                     btn.className = 'btn btn-connect';
                 } else {
@@ -463,6 +599,24 @@ document.addEventListener('DOMContentLoaded', function() {
             return cookieValue;
         }
 
+
+
+
+function toggleProfileMenu(event) {
+    event.preventDefault();
+    let menu = document.getElementById("profileMenu");
+    menu.style.display = (menu.style.display === "block") ? "none" : "block";
+}
+
+// Hide dropdown if clicked outside
+document.addEventListener("click", function(event) {
+    let menu = document.getElementById("profileMenu");
+    let button = document.querySelector(".profile-dropdown");
+    if (!button.contains(event.target)) {
+        menu.style.display = "none";
+    }
+});
+        
     </script>
 </body>
 </html>
